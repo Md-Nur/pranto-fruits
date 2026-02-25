@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #10b981;
+  --color-primary-dark: #059669;
+  --color-accent: #f59e0b;
+  --color-earth-brown: #78350f;
+  --color-organic-green: #064e3b;
+  --color-surface: #f9fafb;
+
+  --font-inter: var(--font-inter);
+  --font-hind-siliguri: var(--font-hind-siliguri);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.125);
+}
+
+.glassmorphism {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter);
+  @apply antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.bangla-text {
+  font-family: var(--font-hind-siliguri);
+}
+
+.page-container {
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: var(--background);
+  min-height: 100vh;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 1441px) {
+  body {
+    background-color: #f3f4f6;
+    /* Subtle light gray for outer margins on ultra-wide screens */
+  }
+}
