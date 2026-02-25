@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { MessageCircle, X, Youtube, Play, ArrowRight, Instagram, ChevronLeft, ChevronRight, Volume2, VolumeX, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ const SocialIntegration = () => {
     const [activeStory, setActiveStory] = useState<number | null>(null);
     const [isMuted, setIsMuted] = useState(true);
     const [progress, setProgress] = useState(0);
+    const pathname = usePathname();
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -201,67 +203,69 @@ const SocialIntegration = () => {
                 )}
             </AnimatePresence>
             {/* YouTube Stories Section */}
-            <section className="py-24 bg-white relative overflow-hidden">
-                {/* Decorative background elements */}
-                <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-                <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl" />
+            {pathname === "/" && (
+                <section className="py-24 bg-white relative overflow-hidden">
+                    {/* Decorative background elements */}
+                    <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+                    <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl" />
 
-                <div className="container mx-auto px-4 md:px-6 relative">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16">
-                        <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-red-50 relative rounded-2xl flex items-center justify-center overflow-hidden group">
-                                <div className="absolute inset-0 bg-red-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                                <Youtube size={32} className="text-red-600 group-hover:text-white transition-colors relative z-10" />
+                    <div className="container mx-auto px-4 md:px-6 relative">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16">
+                            <div className="flex items-center gap-4">
+                                <div className="w-14 h-14 bg-red-50 relative rounded-2xl flex items-center justify-center overflow-hidden group">
+                                    <div className="absolute inset-0 bg-red-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                                    <Youtube size={32} className="text-red-600 group-hover:text-white transition-colors relative z-10" />
+                                </div>
+                                <div>
+                                    <h2 className="text-3xl md:text-4xl font-black text-organic-green font-hind-siliguri leading-tight">গার্ডেন স্টোরিজ</h2>
+                                    <p className="text-gray-500 font-medium">Watch our daily harvest journey</p>
+                                </div>
                             </div>
-                            <div>
-                                <h2 className="text-3xl md:text-4xl font-black text-organic-green font-hind-siliguri leading-tight">গার্ডেন স্টোরিজ</h2>
-                                <p className="text-gray-500 font-medium">Watch our daily harvest journey</p>
-                            </div>
+                            <button className="flex items-center gap-2 text-gray-400 hover:text-primary font-bold transition-all text-sm uppercase tracking-widest">
+                                View All Stories <ArrowRight size={18} />
+                            </button>
                         </div>
-                        <button className="flex items-center gap-2 text-gray-400 hover:text-primary font-bold transition-all text-sm uppercase tracking-widest">
-                            View All Stories <ArrowRight size={18} />
-                        </button>
-                    </div>
 
-                    <div className="flex gap-8 overflow-x-auto pb-12 scrollbar-hide no-scrollbar -mx-4 px-4">
-                        {stories.map((story, idx) => (
-                            <div
-                                key={story.id}
-                                className="flex-shrink-0 group cursor-pointer"
-                                onClick={() => setActiveStory(idx)}
-                            >
-                                <div className="w-24 h-24 md:w-36 md:h-36 rounded-full p-1.5 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 relative transition-transform duration-500 group-hover:scale-105 active:scale-95">
-                                    <div className="w-full h-full rounded-full border-[3px] border-white overflow-hidden relative shadow-lg">
-                                        <img
-                                            src={getYoutubeThumbnail(story.video)}
-                                            alt={story.title}
-                                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
-                                        />
-                                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors flex items-center justify-center">
-                                            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all transform scale-50 group-hover:scale-100 border border-white/30">
-                                                <Play size={20} className="text-white fill-white ml-0.5" />
+                        <div className="flex gap-8 overflow-x-auto pb-12 scrollbar-hide no-scrollbar -mx-4 px-4">
+                            {stories.map((story, idx) => (
+                                <div
+                                    key={story.id}
+                                    className="flex-shrink-0 group cursor-pointer"
+                                    onClick={() => setActiveStory(idx)}
+                                >
+                                    <div className="w-24 h-24 md:w-36 md:h-36 rounded-full p-1.5 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 relative transition-transform duration-500 group-hover:scale-105 active:scale-95">
+                                        <div className="w-full h-full rounded-full border-[3px] border-white overflow-hidden relative shadow-lg">
+                                            <img
+                                                src={getYoutubeThumbnail(story.video)}
+                                                alt={story.title}
+                                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
+                                            />
+                                            <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors flex items-center justify-center">
+                                                <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all transform scale-50 group-hover:scale-100 border border-white/30">
+                                                    <Play size={20} className="text-white fill-white ml-0.5" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                    <p className="text-center mt-4 text-xs font-bold text-gray-700 max-w-[96px] md:max-w-[144px] mx-auto line-clamp-1 group-hover:text-primary transition-colors">
+                                        {story.title}
+                                    </p>
                                 </div>
-                                <p className="text-center mt-4 text-xs font-bold text-gray-700 max-w-[96px] md:max-w-[144px] mx-auto line-clamp-1 group-hover:text-primary transition-colors">
-                                    {story.title}
-                                </p>
-                            </div>
-                        ))}
+                            ))}
 
-                        {/* View More Circle */}
-                        <div className="flex-shrink-0 cursor-pointer group">
-                            <div className="w-24 h-24 md:w-36 md:h-36 rounded-full border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 group-hover:border-primary group-hover:bg-primary/5 group-hover:text-primary transition-all active:scale-95">
-                                <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-primary/10 transition-colors">
-                                    <Instagram size={28} />
+                            {/* View More Circle */}
+                            <div className="flex-shrink-0 cursor-pointer group">
+                                <div className="w-24 h-24 md:w-36 md:h-36 rounded-full border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 group-hover:border-primary group-hover:bg-primary/5 group-hover:text-primary transition-all active:scale-95">
+                                    <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-primary/10 transition-colors">
+                                        <Instagram size={28} />
+                                    </div>
+                                    <span className="text-[10px] md:text-xs font-black uppercase tracking-widest">More</span>
                                 </div>
-                                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest">More</span>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
             {/* Floating WhatsApp Widget */}
             <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-end gap-4">

@@ -10,6 +10,7 @@ const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [user, setUser] = useState<any>(null);
     const { cartCount, setIsCartOpen } = useCart();
     const router = useRouter();
 
@@ -18,8 +19,33 @@ const Navbar = () => {
             setIsScrolled(window.scrollY > 20);
         };
         window.addEventListener("scroll", handleScroll);
+
+        const checkAuth = async () => {
+            try {
+                const res = await fetch("/api/auth/check");
+                const data = await res.json();
+                if (data.authenticated) {
+                    setUser(data.user);
+                }
+            } catch (err) {
+                console.error("Auth check failed", err);
+            }
+        };
+        checkAuth();
+
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const handleLogout = async () => {
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+            setUser(null);
+            router.push("/");
+            router.refresh();
+        } catch (err) {
+            console.error("Logout failed", err);
+        }
+    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -76,25 +102,46 @@ const Navbar = () => {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-5">
                         <button className="p-2 text-gray-600 hover:text-primary transition-colors md:hidden">
                             <Search size={22} />
                         </button>
+
+                        {/* User Profile */}
+                        {user ? (
+                            <div className="hidden md:flex items-center gap-3 bg-gray-50 rounded-full pl-2 pr-4 py-1.5 border border-gray-100">
+                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+                                    {user.name.charAt(0)}
+                                </div>
+                                <span className="text-sm font-medium text-gray-700">{user.name.split(" ")[0]}</span>
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-xs text-gray-400 hover:text-red-500 transition-colors ml-2"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="p-2.5 rounded-full text-gray-600 hover:bg-gray-100 hover:text-primary transition-all duration-300"
+                            >
+                                <User size={22} />
+                            </Link>
+                        )}
+
+                        {/* Cart Trigger */}
                         <button
                             onClick={() => setIsCartOpen(true)}
-                            className="relative p-2 text-gray-600 hover:text-primary transition-colors"
+                            className="p-2.5 rounded-full text-gray-600 hover:bg-gray-100 hover:text-primary transition-all duration-300 relative group"
                         >
                             <ShoppingCart size={22} />
                             {cartCount > 0 && (
-                                <span className="absolute top-0 right-0 w-4 h-4 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                <span className="absolute top-1.5 right-1.5 bg-primary text-white text-[10px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center border-2 border-white group-hover:scale-110 transition-transform">
                                     {cartCount}
                                 </span>
                             )}
                         </button>
-                        <Link href="/login" className="hidden sm:flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-primary-dark transition-colors">
-                            <User size={18} />
-                            <span>Login</span>
-                        </Link>
                         <button
                             className="lg:hidden p-2 text-gray-600"
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight } from "lucide-react";
 import Image from "next/image";
@@ -122,9 +123,9 @@ const CartSideOver = () => {
                                     <span className="text-gray-500">Shipping</span>
                                     <span className="text-sm font-medium text-emerald-600">Calculated at checkout</span>
                                 </div>
-                                <button className="w-full bg-primary text-white py-4 rounded-full font-bold text-lg hover:bg-primary-dark transition-all flex items-center justify-center gap-2 group shadow-xl shadow-primary/20">
+                                <Link href="/checkout" onClick={() => setIsCartOpen(false)} className="w-full bg-primary text-white py-4 rounded-full font-bold text-lg hover:bg-primary-dark transition-all flex items-center justify-center gap-2 group shadow-xl shadow-primary/20">
                                     Checkout Now <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                                </button>
+                                </Link>
                                 <div className="mt-4 flex items-center justify-center gap-4 grayscale opacity-50">
                                     <img src="https://premiumfruitbd.com/wp-content/uploads/2022/10/bkash-logo-01.png" alt="bkash" className="h-4" />
                                     <img src="https://premiumfruitbd.com/wp-content/uploads/2022/10/nagad-logo.png" alt="nagad" className="h-4" />
