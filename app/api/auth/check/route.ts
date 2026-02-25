@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { verifyJwt } from "@/lib/jwt";
+import { verifyJwt } from "@/lib/jwt-utils";
 
 export async function GET() {
     try {

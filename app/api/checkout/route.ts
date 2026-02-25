@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyJwt } from "@/lib/jwt";
+import { verifyJwt } from "@/lib/jwt-utils";
 import { cookies } from "next/headers";
 
 export async function POST(req: Request) {

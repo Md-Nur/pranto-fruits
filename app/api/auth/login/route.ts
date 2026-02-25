@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { signJwt } from "@/lib/jwt";
+import { signJwt } from "@/lib/jwt-utils";
 import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
