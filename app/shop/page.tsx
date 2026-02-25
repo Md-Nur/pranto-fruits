@@ -1,12 +1,10 @@
-"use client";
-
 import React, { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
 import ProductGrid from "@/components/ProductGrid";
+import prisma from "@/lib/prisma";
 
-const ShopContent = () => {
-    const searchParams = useSearchParams();
-    const query = searchParams.get("q");
+const ShopContent = async ({ searchParams }: { searchParams: Promise<{ q?: string }> }) => {
+    const { q: query } = await searchParams;
+    const products = await prisma.product.findMany({ include: { variants: true } });
 
     return (
         <div className="container mx-auto px-4 md:px-6 py-12">
@@ -18,15 +16,15 @@ const ShopContent = () => {
                     Showing our freshest collection of organic and chemical-free fruits.
                 </p>
             </div>
-            <ProductGrid />
+            <ProductGrid products={products} />
         </div>
     );
 };
 
-const ShopPage = () => {
+const ShopPage = ({ searchParams }: { searchParams: Promise<{ q?: string }> }) => {
     return (
         <Suspense fallback={<div className="container mx-auto px-4 py-20 text-center">Loading Shop...</div>}>
-            <ShopContent />
+            <ShopContent searchParams={searchParams} />
         </Suspense>
     );
 };

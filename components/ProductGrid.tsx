@@ -7,11 +7,22 @@ import { ShoppingCart, Heart, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 
-import { products } from "@/data/products";
-
 const categories = ["All", "Mango", "Dates", "Jaggery", "Baskets", "Honey"];
 
-const ProductGrid = () => {
+export interface ProductWithVariants {
+    id: number;
+    name: string;
+    category: string;
+    basePrice: number;
+    priceRange: string;
+    description: string;
+    image: string;
+    details: string[];
+    isNew: boolean;
+    variants: { label: string; price: number; id: number; productId: number }[];
+}
+
+const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
     const [activeCategory, setActiveCategory] = useState("All");
     const { addToCart } = useCart();
 
@@ -19,7 +30,7 @@ const ProductGrid = () => {
         ? products
         : products.filter(p => p.category === activeCategory);
 
-    const handleAddToCart = (product: typeof products[0]) => {
+    const handleAddToCart = (product: ProductWithVariants) => {
         addToCart({
             id: product.id,
             name: product.name,

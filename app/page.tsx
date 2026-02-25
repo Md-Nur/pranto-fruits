@@ -2,13 +2,18 @@ import HeroCarousel from "@/components/HeroCarousel";
 import BentoGrid from "@/components/BentoGrid";
 import ProductGrid from "@/components/ProductGrid";
 import FruitWisdom from "@/components/FruitWisdom";
+import prisma from "@/lib/prisma";
 
-export default function Home() {
+export default async function Home() {
+  const products = await prisma.product.findMany({
+    include: { variants: true },
+  });
+
   return (
     <div className="flex flex-col gap-0 overflow-hidden">
       <HeroCarousel />
       <BentoGrid />
-      <ProductGrid />
+      <ProductGrid products={products} />
       <FruitWisdom />
 
       {/* Newsletter / CTA Section */}
