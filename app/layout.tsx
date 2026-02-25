@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import TrustFooter from "@/components/TrustFooter";
 import { CartProvider } from "@/context/CartContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 import CartSideOver from "@/components/CartSideOver";
 import SocialIntegration from "@/components/SocialIntegration";
 
@@ -35,15 +36,17 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <CartProvider>
-          <div className="page-container relative">
-            <Navbar />
-            <main className="pt-20">
-              {children}
-            </main>
-            <CartSideOver />
-            <SocialIntegration />
-            <TrustFooter />
-          </div>
+          <WishlistProvider>
+            <div className="page-container relative">
+              <Navbar />
+              <main className="pt-20">
+                {children}
+              </main>
+              <CartSideOver />
+              <SocialIntegration />
+              <TrustFooter />
+            </div>
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

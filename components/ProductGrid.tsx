@@ -6,6 +6,8 @@ import Image from "next/image";
 import { ShoppingCart, Heart, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
+import QuickViewModal from "./QuickViewModal";
 
 const categories = ["All", "Mango", "Dates", "Jaggery", "Baskets", "Honey"];
 
@@ -24,7 +26,9 @@ export interface ProductWithVariants {
 
 const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
     const [activeCategory, setActiveCategory] = useState("All");
+    const [selectedProduct, setSelectedProduct] = useState<ProductWithVariants | null>(null);
     const { addToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
 
     const filteredProducts = activeCategory === "All"
         ? products
@@ -37,7 +41,7 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
             price: product.basePrice,
             image: product.image,
             quantity: 1,
-            variant: product.variants[0].label
+            variant: product.variants[0]?.label
         });
     };
 
@@ -85,11 +89,22 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
                                 )}
 
                                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                                    <button className="w-10 h-10 rounded-full bg-white text-organic-green flex items-center justify-center hover:bg-primary hover:text-white transition-all transform scale-0 group-hover:scale-100 delay-[0ms]">
+                                    <button
+                                        onClick={() => setSelectedProduct(product)}
+                                        className="w-10 h-10 rounded-full bg-white text-organic-green flex items-center justify-center hover:bg-primary hover:text-white transition-all transform scale-0 group-hover:scale-100 delay-[0ms]"
+                                    >
                                         <Eye size={20} />
                                     </button>
-                                    <button className="w-10 h-10 rounded-full bg-white text-organic-green flex items-center justify-center hover:bg-primary hover:text-white transition-all transform scale-0 group-hover:scale-100 delay-[50ms]">
-                                        <Heart size={20} />
+                                    <button
+                                        onClick={() => toggleWishlist(product.id)}
+                                        className={cn(
+                                            "w-10 h-10 rounded-full flex items-center justify-center transition-all transform scale-0 group-hover:scale-100 delay-[50ms]",
+                                            isInWishlist(product.id)
+                                                ? "bg-red-500 text-white"
+                                                : "bg-white text-organic-green hover:bg-primary hover:text-white"
+                                        )}
+                                    >
+                                        <Heart size={20} className={cn(isInWishlist(product.id) && "fill-current")} />
                                     </button>
                                 </div>
 
@@ -125,6 +140,11 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
                     ))}
                 </div>
             </div>
+
+            <QuickViewModal
+                product={selectedProduct}
+                onClose={() => setSelectedProduct(null)}
+            />
         </section>
     );
 };
