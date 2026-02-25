@@ -6,14 +6,14 @@ import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
     try {
-        const { email, password } = await req.json();
+        const { phone, password } = await req.json();
 
-        if (!email || !password) {
+        if (!phone || !password) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({
-            where: { email },
+            where: { phone },
         });
 
         if (!user) {
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
-        const token = await signJwt({ id: user.id, email: user.email, role: user.role });
+        const token = await signJwt({ id: user.id, phone: user.phone, role: user.role });
 
         if (token) {
             const cookieStore = await cookies();
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json({
-            user: { id: user.id, name: user.name, email: user.email, role: user.role }
+            user: { id: user.id, name: user.name, phone: user.phone, role: user.role }
         }, { status: 200 });
 
     } catch (error) {

@@ -10,7 +10,7 @@ const CorporateGifting = () => {
             {/* Hero Section */}
             <section className="relative h-[400px] flex items-center justify-center overflow-hidden">
                 <Image
-                    src="https://images.unsplash.com/photo-1595123550441-df74130094e9?q=80&w=2000&auto=format&fit=crop"
+                    src="https://images.unsplash.com/photo-1670540805686-a73a025c0dd1?q=80&w=1167&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                     alt="Corporate Gifting"
                     fill
                     className="object-cover"

@@ -127,8 +127,8 @@ const CartSideOver = () => {
                                     Checkout Now <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <div className="mt-4 flex items-center justify-center gap-4 grayscale opacity-50">
-                                    <img src="https://premiumfruitbd.com/wp-content/uploads/2022/10/bkash-logo-01.png" alt="bkash" className="h-4" />
-                                    <img src="https://premiumfruitbd.com/wp-content/uploads/2022/10/nagad-logo.png" alt="nagad" className="h-4" />
+                                    <img src="https://images.seeklogo.com/logo-png/38/1/bkash-logo-png_seeklogo-382709.png" alt="bkash" className="h-4" />
+                                    <img src="https://www.logo.wine/a/logo/Nagad/Nagad-Logo.wine.svg" alt="nagad" className="h-4" />
                                 </div>
                             </div>
                         )}

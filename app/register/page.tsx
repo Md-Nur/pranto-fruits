@@ -1,44 +1,71 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Mail, Lock, Loader2, AlertCircle, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, User, Lock, Loader2, AlertCircle, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 
-function LoginContent() {
+function RegisterContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectPath = searchParams.get("redirect") || "/";
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [phone, setPhone] = useState("");
-    const [password, setPassword] = useState("");
     const [isSuccess, setIsSuccess] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const [formData, setFormData] = useState({
+        name: "",
+        phone: "",
+        password: "",
+        confirmPassword: ""
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError("");
 
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match");
+            setIsLoading(false);
+            return;
+        }
+
+        if (formData.phone.length < 11) {
+            setError("Invalid phone number");
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            const res = await fetch("/api/auth/login", {
+            const res = await fetch("/api/auth/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone, password }),
+                body: JSON.stringify({
+                    name: formData.name,
+                    phone: formData.phone,
+                    password: formData.password
+                }),
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.error || "Login failed");
+                throw new Error(data.error || "Registration failed");
             }
 
-            // Successful login
+            // Successful registration
             setIsSuccess(true);
-            router.push(redirectPath);
-            router.refresh();
+            setTimeout(() => {
+                router.push(redirectPath);
+                router.refresh();
+            }, 2000);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -53,20 +80,20 @@ function LoginContent() {
             <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-organic-green/5 rounded-full blur-3xl" />
 
             <div className="w-full max-w-md z-10">
-                <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-primary transition-colors mb-8 group">
+                <Link href="/login" className="inline-flex items-center gap-2 text-gray-500 hover:text-primary transition-colors mb-8 group">
                     <div className="bg-gray-50 p-2 rounded-full group-hover:bg-primary/10 transition-colors">
                         <ArrowLeft size={18} />
                     </div>
-                    <span className="font-medium">Back to Home</span>
+                    <span className="font-medium">Back to Login</span>
                 </Link>
 
                 <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 md:p-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
                     <div className="text-center mb-10">
                         <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 text-primary rounded-2xl mb-6">
-                            <Lock size={32} />
+                            <User size={32} />
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-                        <p className="text-gray-500">Log in to your account with mobile number</p>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
+                        <p className="text-gray-500">Join us for fresh organic fruits</p>
                     </div>
 
                     {error && (
@@ -79,11 +106,29 @@ function LoginContent() {
                     {isSuccess && (
                         <div className="mb-6 p-4 bg-green-50 border border-green-100 text-green-600 rounded-2xl flex items-center gap-3 text-sm animate-in fade-in duration-300">
                             <CheckCircle2 size={18} className="shrink-0" />
-                            <span>Login successful! Redirecting...</span>
+                            <span>Registration successful! Redirecting...</span>
                         </div>
                     )}
 
-                    <form onSubmit={handleLogin} className="space-y-5">
+                    <form onSubmit={handleRegister} className="space-y-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-700 ml-1">Full Name</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <User size={20} />
+                                </span>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    required
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    placeholder="Enter your name"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all placeholder:text-gray-400"
+                                />
+                            </div>
+                        </div>
+
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-700 ml-1">Mobile Number</label>
                             <div className="relative">
@@ -92,9 +137,10 @@ function LoginContent() {
                                 </span>
                                 <input
                                     type="tel"
+                                    name="phone"
                                     required
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
+                                    value={formData.phone}
+                                    onChange={handleChange}
                                     placeholder="01XXXXXXXXX"
                                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all placeholder:text-gray-400"
                                 />
@@ -102,21 +148,17 @@ function LoginContent() {
                         </div>
 
                         <div className="space-y-2">
-                            <div className="flex justify-between items-center ml-1">
-                                <label className="text-sm font-semibold text-gray-700">Password</label>
-                                <Link href="#" className="text-xs font-bold text-primary hover:text-primary-dark transition-colors">
-                                    Forgot Password?
-                                </Link>
-                            </div>
+                            <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
                             <div className="relative">
                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <Lock size={20} />
                                 </span>
                                 <input
                                     type={showPassword ? "text" : "password"}
+                                    name="password"
                                     required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={formData.password}
+                                    onChange={handleChange}
                                     placeholder="••••••••"
                                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl pl-12 pr-12 py-4 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all placeholder:text-gray-400"
                                 />
@@ -130,6 +172,24 @@ function LoginContent() {
                             </div>
                         </div>
 
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-700 ml-1">Confirm Password</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <Lock size={20} />
+                                </span>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="confirmPassword"
+                                    required
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    placeholder="••••••••"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all placeholder:text-gray-400"
+                                />
+                            </div>
+                        </div>
+
                         <div className="pt-4">
                             <button
                                 type="submit"
@@ -139,10 +199,10 @@ function LoginContent() {
                                 {isLoading ? (
                                     <>
                                         <Loader2 size={24} className="animate-spin" />
-                                        <span>Logging in...</span>
+                                        <span>Creating account...</span>
                                     </>
                                 ) : (
-                                    <span>Log In</span>
+                                    <span>Sign Up</span>
                                 )}
                             </button>
                         </div>
@@ -150,32 +210,26 @@ function LoginContent() {
 
                     <div className="mt-8 text-center pt-6 border-t border-gray-100">
                         <p className="text-gray-500">
-                            Don&apos;t have an account?{" "}
-                            <Link href="/register" className="text-primary font-bold hover:underline">
-                                Sign Up
+                            Already have an account?{" "}
+                            <Link href="/login" className="text-primary font-bold hover:underline">
+                                Log In
                             </Link>
                         </p>
                     </div>
-                </div>
-
-                {/* Secure Badge */}
-                <div className="mt-12 flex items-center justify-center gap-3 text-gray-400">
-                    <CheckCircle2 size={16} />
-                    <span className="text-xs font-medium tracking-wide uppercase">Secure and Encrypted Login</span>
                 </div>
             </div>
         </div>
     );
 }
 
-export default function LoginPage() {
+export default function RegisterPage() {
     return (
         <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center">
                 <Loader2 size={40} className="animate-spin text-primary" />
             </div>
         }>
-            <LoginContent />
+            <RegisterContent />
         </Suspense>
     );
 }

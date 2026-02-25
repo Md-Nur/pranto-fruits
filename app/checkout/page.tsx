@@ -41,6 +41,7 @@ export default function CheckoutPage() {
                         ...prev,
                         firstName: nameParts[0] || "",
                         lastName: nameParts.slice(1).join(" ") || "",
+                        phone: data.user.phone || prev.phone,
                     }));
                 }
             } catch (err) {

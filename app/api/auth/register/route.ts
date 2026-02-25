@@ -6,18 +6,18 @@ import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
     try {
-        const { name, email, password } = await req.json();
+        const { name, phone, password } = await req.json();
 
-        if (!name || !email || !password) {
+        if (!name || !phone || !password) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
         const existingUser = await prisma.user.findUnique({
-            where: { email },
+            where: { phone },
         });
 
         if (existingUser) {
-            return NextResponse.json({ error: "Email already registered" }, { status: 400 });
+            return NextResponse.json({ error: "Phone number already registered" }, { status: 400 });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -25,12 +25,12 @@ export async function POST(req: Request) {
         const user = await prisma.user.create({
             data: {
                 name,
-                email,
+                phone,
                 password: hashedPassword,
             },
         });
 
-        const token = await signJwt({ id: user.id, email: user.email, role: user.role });
+        const token = await signJwt({ id: user.id, phone: user.phone, role: user.role });
 
         if (token) {
             const cookieStore = await cookies();
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json({
-            user: { id: user.id, name: user.name, email: user.email, role: user.role }
+            user: { id: user.id, name: user.name, phone: user.phone, role: user.role }
         }, { status: 201 });
 
     } catch (error) {
