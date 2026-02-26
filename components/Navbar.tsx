@@ -111,9 +111,9 @@ const Navbar = () => {
                         {user ? (
                             <div className="hidden md:flex items-center gap-3 bg-gray-50 rounded-full pl-2 pr-4 py-1.5 border border-gray-100">
                                 <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
-                                    {user.name.charAt(0)}
+                                    {(user.name || user.phone || "U").charAt(0)}
                                 </div>
-                                <span className="text-sm font-medium text-gray-700">{user.name.split(" ")[0]}</span>
+                                <span className="text-sm font-medium text-gray-700">{user.name ? user.name.split(" ")[0] : user.phone}</span>
                                 <button
                                     onClick={handleLogout}
                                     className="text-xs text-gray-400 hover:text-red-500 transition-colors ml-2"

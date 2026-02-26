@@ -36,7 +36,7 @@ export default function CheckoutPage() {
                 const data = await res.json();
                 if (data.authenticated) {
                     setUser(data.user);
-                    const nameParts = data.user.name.split(" ");
+                    const nameParts = (data.user.name || "").split(" ");
                     setShippingInfo(prev => ({
                         ...prev,
                         firstName: nameParts[0] || "",

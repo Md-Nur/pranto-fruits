@@ -2,8 +2,7 @@ import React, { Suspense } from "react";
 import ProductGrid from "@/components/ProductGrid";
 import prisma from "@/lib/prisma";
 
-const ShopContent = async ({ searchParams }: { searchParams: Promise<{ q?: string }> }) => {
-    const { q: query } = await searchParams;
+const ShopContent = async ({ query }: { query?: string }) => {
     const products = await prisma.product.findMany({ include: { variants: true } });
 
     return (
@@ -21,10 +20,11 @@ const ShopContent = async ({ searchParams }: { searchParams: Promise<{ q?: strin
     );
 };
 
-const ShopPage = ({ searchParams }: { searchParams: Promise<{ q?: string }> }) => {
+const ShopPage = async ({ searchParams }: { searchParams: Promise<{ q?: string }> }) => {
+    const { q: query } = await searchParams;
     return (
         <Suspense fallback={<div className="container mx-auto px-4 py-20 text-center">Loading Shop...</div>}>
-            <ShopContent searchParams={searchParams} />
+            <ShopContent query={query} />
         </Suspense>
     );
 };
