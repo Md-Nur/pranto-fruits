@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Package, Truck, CheckCircle2, MapPin, Clock } from "lucide-react";
+import { Search, Package, Truck, CheckCircle2, MapPin, Clock, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const timelinePositions = [
@@ -14,6 +14,30 @@ const timelinePositions = [
 const TrackOrder = () => {
     const [orderId, setOrderId] = useState("");
     const [showResult, setShowResult] = useState(false);
+    const [orders, setOrders] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [activeOrderDetails, setActiveOrderDetails] = useState<any>(null);
+
+    React.useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const checkRes = await fetch("/api/auth/check");
+                const checkData = await checkRes.json();
+                if (checkData.authenticated) {
+                    const res = await fetch("/api/orders/user");
+                    if (res.ok) {
+                        const data = await res.json();
+                        setOrders(data.orders);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOrders();
+    }, []);
 
     const handleTrack = (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,6 +51,55 @@ const TrackOrder = () => {
                     <h1 className="text-3xl md:text-5xl font-bold text-organic-green mb-4">আপনার অর্ডার ট্র্যাক করুন</h1>
                     <p className="text-gray-500">আপনার কনফার্মেশন এসএমএস-এ দেওয়া অর্ডার আইডি লিখুন।</p>
                 </div>
+
+                {!loading && orders.length > 0 && (
+                    <div className="mb-12">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-gray-800">আপনার সাম্প্রতিক অর্ডারসমূহ</h2>
+                        </div>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            {orders.slice(0, 4).map((order) => (
+                                <div key={order.id} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                            <Package size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-800">অর্ডার #PF-{order.id.toString().padStart(6, '0')}</p>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className={cn(
+                                                    "text-xs px-2 py-1 rounded-full font-medium",
+                                                    order.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-700' :
+                                                        order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
+                                                            'bg-blue-100 text-blue-700'
+                                                )}>
+                                                    {order.status === 'PENDING' && "পেন্ডিং"}
+                                                    {order.status === 'PROCESSING' && "প্রসেসিং হচ্ছে"}
+                                                    {order.status === 'SHIPPED' && "পথে আছে"}
+                                                    {order.status === 'DELIVERED' && "ডেলিভারি হয়েছে"}
+                                                    {order.status === 'CANCELLED' && "বাতিল"}
+                                                </span>
+                                                <span className="text-xs text-gray-400 font-medium">
+                                                    {new Date(order.createdAt).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            setOrderId(`PF-${order.id.toString().padStart(6, '0')}`);
+                                            setActiveOrderDetails(order);
+                                            setShowResult(true);
+                                        }}
+                                        className="text-primary hover:text-primary-dark p-2 hover:bg-primary/5 rounded-lg transition-colors"
+                                    >
+                                        <ExternalLink size={20} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <form onSubmit={handleTrack} className="flex flex-col sm:flex-row gap-4 mb-16">
                     <div className="flex-1 relative">
@@ -50,17 +123,35 @@ const TrackOrder = () => {
                             <div>
                                 <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">অর্ডার স্ট্যাটাস</p>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
-                                    <span className="text-xl font-bold text-organic-green">পথে আছে</span>
+                                    {(activeOrderDetails?.status === 'PROCESSING' || activeOrderDetails?.status === 'SHIPPED') && (
+                                        <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
+                                    )}
+                                    <span className={cn("text-xl font-bold",
+                                        activeOrderDetails?.status === 'CANCELLED' ? 'text-red-500' : 'text-organic-green'
+                                    )}>
+                                        {activeOrderDetails ? (
+                                            activeOrderDetails.status === 'PENDING' ? "পেন্ডিং" :
+                                                activeOrderDetails.status === 'PROCESSING' ? "প্রসেসিং হচ্ছে" :
+                                                    activeOrderDetails.status === 'SHIPPED' ? "পথে আছে" :
+                                                        activeOrderDetails.status === 'DELIVERED' ? "ডেলিভারি হয়েছে" :
+                                                            "বাতিল"
+                                        ) : "পথে আছে"}
+                                    </span>
                                 </div>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">সম্ভাব্য ডেলিভারি</p>
-                                <span className="text-xl font-bold text-organic-green">২৫ ফেব্রুয়ারি, ২০২৬ (আজ)</span>
+                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">অর্ডার কনফার্ম</p>
+                                <span className="text-xl font-bold text-organic-green">
+                                    {activeOrderDetails
+                                        ? new Date(activeOrderDetails.createdAt).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' })
+                                        : "২৪ ফেব্রুয়ারি, ২০২৬"}
+                                </span>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">ডেলিভারি পার্টনার</p>
-                                <span className="text-xl font-bold text-organic-green">পিএফ ফাস্ট ডেলিভারি</span>
+                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">মোট মূল্য</p>
+                                <span className="text-xl font-bold text-organic-green">
+                                    {activeOrderDetails ? `৳${activeOrderDetails.totalAmount}` : "৳১২৫০"}
+                                </span>
                             </div>
                         </div>
 
