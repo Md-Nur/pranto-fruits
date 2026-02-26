@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyJwt } from "@/lib/jwt-utils";
+import prisma from "@/lib/prisma";
 
 export async function GET() {
     try {
@@ -13,13 +14,31 @@ export async function GET() {
 
         const payload = await verifyJwt(token);
 
-        if (!payload) {
+        if (!payload || !payload.id) {
+            return NextResponse.json({ authenticated: false }, { status: 401 });
+        }
+
+        // Fetch full user from DB to include saved address fields
+        const user = await prisma.user.findUnique({
+            where: { id: payload.id as number },
+            select: {
+                id: true,
+                name: true,
+                phone: true,
+                role: true,
+                address: true,
+                city: true,
+                zipCode: true,
+            },
+        });
+
+        if (!user) {
             return NextResponse.json({ authenticated: false }, { status: 401 });
         }
 
         return NextResponse.json({
             authenticated: true,
-            user: payload
+            user,
         });
     } catch (error) {
         return NextResponse.json({ authenticated: false }, { status: 500 });

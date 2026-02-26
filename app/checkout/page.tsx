@@ -42,6 +42,9 @@ export default function CheckoutPage() {
                         firstName: nameParts[0] || "",
                         lastName: nameParts.slice(1).join(" ") || "",
                         phone: data.user.phone || prev.phone,
+                        address: data.user.address || prev.address,
+                        city: data.user.city || prev.city,
+                        zipCode: data.user.zipCode || prev.zipCode,
                     }));
                 }
             } catch (err) {
@@ -86,8 +89,22 @@ export default function CheckoutPage() {
                 throw new Error(data.error || "Failed to place order");
             }
 
+            // Save address fields to user profile for next time
+            try {
+                await fetch("/api/user/profile", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        address: shippingInfo.address,
+                        city: shippingInfo.city,
+                        zipCode: shippingInfo.zipCode,
+                    }),
+                });
+            } catch {
+                // Non-critical: ignore profile save errors
+            }
+
             setStep(3);
-            // In a real app, you would clear the cart here
         } catch (err: any) {
             setError(err.message);
         } finally {

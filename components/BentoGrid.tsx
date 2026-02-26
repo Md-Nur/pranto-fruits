@@ -8,7 +8,7 @@ const items = [
         description: "Completely chemical and formalin-free fruits harvested with natural methods.",
         icon: <ShieldCheck size={40} />,
         className: "md:col-span-2 md:row-span-2 bg-emerald-50 text-emerald-900",
-        illustration: "https://images.unsplash.com/photo-1592150621344-78439b734823?q=80&w=1778&auto=format&fit=crop"
+        illustration: "https://plus.unsplash.com/premium_photo-1678912126864-e59a8c611200?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
         title: "Premium Packaging",
