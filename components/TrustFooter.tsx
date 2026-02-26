@@ -52,11 +52,11 @@ const TrustFooter = () => {
                         <ul className="space-y-4 text-emerald-100/70">
                             <li className="flex gap-3">
                                 <Phone size={18} className="text-primary shrink-0" />
-                                <span>+880 1XXX-XXXXXX</span>
+                                <span>+880 1758341956</span>
                             </li>
                             <li className="flex gap-3">
                                 <Mail size={18} className="text-primary shrink-0" />
-                                <span>hello@premiumfruitbd.com</span>
+                                <span>hello@prantofruitbd.com</span>
                             </li>
                             <li className="flex gap-3">
                                 <MapPin size={18} className="text-primary shrink-0" />

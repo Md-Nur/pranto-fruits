@@ -2,35 +2,15 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock } from "lucide-react";
+import prisma from "@/lib/prisma";
 
-const articles = [
-    {
-        title: "কাঁচা আমের অবিশ্বাস্য স্বাস্থ্য উপকারিতা",
-        excerpt: "কাঁচা আম শুধু সুস্বাদুই নয়, এতে রয়েছে প্রচুর ভিটামিন ও অ্যান্টিঅক্সিডেন্ট যা রোগ প্রতিরোধ ক্ষমতা বাড়ায়।",
-        image: "https://images.unsplash.com/photo-1655168339415-fc5a98a7184f?q=80&w=522&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        date: "১২ মে, ২০২৪",
-        readTime: "৫ মিনিট পড়া",
-        tag: "স্বাস্থ্য"
-    },
-    {
-        title: "কেন মরিয়ম খেজুর একটি আদর্শ সুপারফুড",
-        excerpt: "ফাইবার ও প্রাকৃতিক চিনিতে ভরপুর খেজুর আপনার ব্যস্ত জীবনে দীর্ঘস্থায়ী শক্তি জোগায়।",
-        image: "https://plus.unsplash.com/premium_photo-1676208753932-6e8bc83a0b0d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        date: "২৮ এপ্রিল, ২০২৪",
-        readTime: "৪ মিনিট পড়া",
-        tag: "পুষ্টি"
-    },
-    {
-        title: "টেকসই চাষাবাদ: আমাদের ২-ধাপ প্রক্রিয়া",
-        excerpt: "জানুন কীভাবে আমরা ফসল সংগ্রহ থেকে আপনার ঘর পর্যন্ত ১০০% রাসায়নিকমুক্ত রাখি।",
-        image: "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?q=80&w=2070&auto=format&fit=crop",
-        date: "১৫ এপ্রিল, ২০২৪",
-        readTime: "৬ মিনিট পড়া",
-        tag: "কৃষি"
-    }
-];
+const FruitWisdom = async () => {
+    const articles = await prisma.blogPost.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+    });
 
-const FruitWisdom = () => {
     return (
         <section className="py-20 bg-surface">
             <div className="container mx-auto px-4 md:px-6">
@@ -45,8 +25,8 @@ const FruitWisdom = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {articles.map((article, index) => (
-                        <article key={index} className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                    {articles.map((article) => (
+                        <article key={article.id} className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
                             <div className="relative h-56 overflow-hidden">
                                 <Image
                                     src={article.image}
@@ -60,7 +40,14 @@ const FruitWisdom = () => {
                             </div>
                             <div className="p-6">
                                 <div className="flex items-center gap-4 text-xs text-gray-400 mb-4">
-                                    <span className="flex items-center gap-1"><Clock size={14} /> {article.date}</span>
+                                    <span className="flex items-center gap-1">
+                                        <Clock size={14} />
+                                        {new Date(article.createdAt).toLocaleDateString("bn-BD", {
+                                            day: "numeric",
+                                            month: "long",
+                                            year: "numeric",
+                                        })}
+                                    </span>
                                     <span>{article.readTime}</span>
                                 </div>
                                 <h3 className="text-xl font-bold text-organic-green mb-3 line-clamp-2 leading-tight">
@@ -69,9 +56,12 @@ const FruitWisdom = () => {
                                 <p className="text-gray-600 text-sm line-clamp-3 mb-6">
                                     {article.excerpt}
                                 </p>
-                                <button className="text-primary font-bold inline-flex items-center gap-2 group/btn">
+                                <Link
+                                    href={`/wisdom/${article.id}`}
+                                    className="text-primary font-bold inline-flex items-center gap-2 group/btn"
+                                >
                                     আরও পড়ুন <ArrowRight size={16} className="transition-transform group-hover/btn:translate-x-1" />
-                                </button>
+                                </Link>
                             </div>
                         </article>
                     ))}

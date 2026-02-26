@@ -80,7 +80,7 @@ const Navbar = () => {
                         <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">হোম</Link>
                         <Link href="/shop" className="text-sm font-medium hover:text-primary transition-colors">শপ</Link>
                         <Link href="/gifts" className="text-sm font-medium hover:text-primary transition-colors">উপহার</Link>
-                        <Link href="/wisdom" className="text-sm font-medium hover:text-primary transition-colors">জ্ঞান</Link>
+                        <Link href="/wisdom" className="text-sm font-medium hover:text-primary transition-colors">ব্লগ</Link>
                         <Link href="/track" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
                             <MapPin size={14} /> অর্ডার ট্র্যাক করুন
                         </Link>

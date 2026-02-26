@@ -23,11 +23,11 @@ export default async function Home() {
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
               <div className="max-w-xl">
                 <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                  তাজা বিপ্লবে যোগ দিন। ১০% ছাড় পান!
+                   প্রান্ত ফ্রুটস কমিউনিটিতে যোগ দিন
                 </h2>
                 <p className="text-emerald-100/70 text-lg mb-8">
-                  ফ্রুট ওয়িজডম নিউজলেটারে সাবস্ক্রাইব করুন এবং মৌসুমী ফসল ও বিশেষ অফার সম্পর্কে সবার আগে জানুন।
-                </p>
+                   আমাদের নিউজলেটারে সাবস্ক্রাইব করুন এবং মৌসুমী ফসল ও বিশেষ অফার সম্পর্কে সবার আগে জানুন।
+                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 max-w-md">
                   <input
                     type="email"
