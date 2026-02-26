@@ -88,27 +88,34 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
                                     </div>
                                 )}
 
-                                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                {/* Overlay with action icons – always visible on mobile, hover-only on sm+ */}
+                                <div className="absolute inset-0 bg-black/5 sm:opacity-0 opacity-100 group-hover:opacity-100 transition-opacity" />
+
+                                {/* Eye & Wishlist icons: top-right corner, always accessible on mobile */}
+                                <div className="absolute top-3 right-3 flex flex-col gap-2">
                                     <button
                                         onClick={() => setSelectedProduct(product)}
-                                        className="w-10 h-10 rounded-full bg-white text-organic-green flex items-center justify-center hover:bg-primary hover:text-white transition-all transform scale-0 group-hover:scale-100 delay-[0ms]"
+                                        className="w-9 h-9 rounded-full bg-white text-organic-green flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-md sm:opacity-0 sm:scale-75 sm:translate-x-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 duration-200"
+                                        aria-label="Quick view"
                                     >
-                                        <Eye size={20} />
+                                        <Eye size={18} />
                                     </button>
                                     <button
                                         onClick={() => toggleWishlist(product.id)}
                                         className={cn(
-                                            "w-10 h-10 rounded-full flex items-center justify-center transition-all transform scale-0 group-hover:scale-100 delay-[50ms]",
+                                            "w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-md duration-200 sm:opacity-0 sm:scale-75 sm:translate-x-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 delay-75",
                                             isInWishlist(product.id)
                                                 ? "bg-red-500 text-white"
                                                 : "bg-white text-organic-green hover:bg-primary hover:text-white"
                                         )}
+                                        aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
                                     >
-                                        <Heart size={20} className={cn(isInWishlist(product.id) && "fill-current")} />
+                                        <Heart size={18} className={cn(isInWishlist(product.id) && "fill-current")} />
                                     </button>
                                 </div>
 
-                                <div className="absolute bottom-4 left-4 right-4 translate-y-12 group-hover:translate-y-0 transition-transform duration-300">
+                                {/* Add to Cart: always at bottom on mobile, slides up on desktop hover */}
+                                <div className="absolute bottom-4 left-4 right-4 sm:translate-y-14 sm:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                                     <button
                                         onClick={() => handleAddToCart(product)}
                                         className="w-full bg-white text-organic-green font-bold py-3 rounded-2xl shadow-xl hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-2"

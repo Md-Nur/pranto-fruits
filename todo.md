@@ -1,1 +1,1 @@
-the slide which comes for the cart that is not scrollable
+in mobile view the search bar is not visible properly and not working
