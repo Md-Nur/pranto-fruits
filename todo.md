@@ -1,6 +1,3 @@
-
-if the user is login show thier order's in /track page. make it easy to track thier order no need to paste order id.
-
 after the order is placed refresh the cart.
 
 after add to cart and refresh the page cart item vanishes. why?
