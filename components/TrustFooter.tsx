@@ -19,16 +19,16 @@ const TrustFooter = () => {
                             ২০১২ সাল থেকে শ্রেষ্ঠত্ব চাষাবাদ করে আসছি। আমরা বাংলাদেশের বাগান থেকে সরাসরি সবচেয়ে খাঁটি ও স্বাস্থ্যকর ফল সরবরাহে নিবেদিত।
                         </p>
                         <div className="flex gap-4">
-                            <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+                            <a href="https://www.facebook.com/prantofruits" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
                                 <Facebook size={20} />
                             </a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+                            <a href="https://www.instagram.com/prantofruits" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
                                 <Instagram size={20} />
                             </a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+                            <a href="https://www.x.com/prantofruits" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
                                 <Twitter size={20} />
                             </a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+                            <a href="https://www.youtube.com/prantofruits" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
                                 <Youtube size={20} />
                             </a>
                         </div>
