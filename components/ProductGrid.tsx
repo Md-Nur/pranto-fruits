@@ -49,7 +49,7 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
         <section className="py-20 bg-white">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-                    <h2 className="text-3xl font-bold text-organic-green">Our Fresh Harvest</h2>
+                    <h2 className="text-3xl font-bold text-organic-green">আমাদের তাজা ফসল</h2>
 
                     <div className="flex flex-wrap gap-2 justify-center">
                         {categories.map((cat) => (
