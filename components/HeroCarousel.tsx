@@ -8,27 +8,27 @@ import Image from "next/image";
 
 const slides = [
     {
-        title: "King of Fruits: Rajshahi Mango",
-        subtitle: "Naturally Ripened, Chemical-Free",
-        description: "Directly from the orchards of Rajshahi, delivered fresh to your doorstep.",
+        title: "ফলের রাজা: রাজশাহীর আম",
+        subtitle: "প্রাকৃতিকভাবে পাকানো, রাসায়নিকমুক্ত",
+        description: "রাজশাহীর বাগান থেকে সরাসরি আপনার দরজায় পৌঁছে দেওয়া তাজা ও খাঁটি আম।",
         image: "https://images.unsplash.com/photo-1553279768-865429fa0078?q=80&w=1974&auto=format&fit=crop",
-        cta: "Order Now",
+        cta: "এখনই অর্ডার করুন",
         color: "bg-orange-50"
     },
     {
-        title: "Premium Maryam Dates",
-        subtitle: "Sweet, Tender & Nutritious",
-        description: "The finest selection of dates for your healthy snacking and gifting needs.",
+        title: "প্রিমিয়াম মরিয়ম খেজুর",
+        subtitle: "মিষ্টি, নরম ও পুষ্টিকর",
+        description: "আপনার সুস্বাস্থ্য ও উপহারের জন্য সেরা মানের খেজুরের বাছাই করা সংগ্রহ।",
         image: "https://images.unsplash.com/photo-1614061811858-dde54a522f5e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        cta: "Explore Dates",
+        cta: "খেজুর দেখুন",
         color: "bg-amber-50"
     },
     {
-        title: "Corporate Gifting Solutions",
-        subtitle: "Elegant, Healthy & Professional",
-        description: "Impressionable fruit baskets and boxes for your corporate clients and employees.",
+        title: "কর্পোরেট গিফটিং সমাধান",
+        subtitle: "মার্জিত, স্বাস্থ্যকর ও পেশাদার",
+        description: "আপনার ক্লায়েন্ট ও কর্মীদের জন্য চমৎকার ফলের ঝুড়ি ও বক্স উপহার দিন।",
         image: "https://images.unsplash.com/photo-1606498679463-30a0eb8824e1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        cta: "Get Inquiry",
+        cta: "অনুসন্ধান করুন",
         color: "bg-green-50"
     }
 ];

@@ -4,27 +4,27 @@ import { cn } from "@/lib/utils";
 
 const items = [
     {
-        title: "Safe Garden",
-        description: "Completely chemical and formalin-free fruits harvested with natural methods.",
+        title: "নিরাপদ বাগান",
+        description: "সম্পূর্ণ রাসায়নিক ও ফরমালিনমুক্ত ফল, প্রাকৃতিক পদ্ধতিতে সংগ্রহ করা।",
         icon: <ShieldCheck size={40} />,
         className: "md:col-span-2 md:row-span-2 bg-emerald-50 text-emerald-900",
         illustration: "https://plus.unsplash.com/premium_photo-1678912126864-e59a8c611200?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
-        title: "Premium Packaging",
-        description: "Specialized export-quality boxes to ensure zero damage during transit.",
+        title: "প্রিমিয়াম প্যাকেজিং",
+        description: "রপ্তানিমানের বিশেষ বাক্সে পরিবহনের সময় কোনো ক্ষতি ছাড়াই পৌঁছে দেওয়া হয়।",
         icon: <Package size={30} />,
         className: "bg-orange-50 text-orange-900",
     },
     {
-        title: "Garden Fresh",
-        description: "Delivered within 24-48 hours of harvest for maximum nutrition.",
+        title: "বাগান-তাজা ফল",
+        description: "সর্বোচ্চ পুষ্টির জন্য ফসল তোলার ২৪-৪৮ ঘণ্টার মধ্যে ডেলিভারি দেওয়া হয়।",
         icon: <Leaf size={30} />,
         className: "bg-lime-50 text-lime-900",
     },
     {
-        title: "Quality Assured",
-        description: "Multi-step sorting process to ensure only the best reaches you.",
+        title: "মান নিশ্চিত",
+        description: "আপনার কাছে শুধু সেরাটি পৌঁছায় তা নিশ্চিত করতে বহু-ধাপের বাছাই প্রক্রিয়া।",
         icon: <Award size={30} />,
         className: "md:col-span-2 bg-stone-50 text-stone-900 py-12",
     }
@@ -35,8 +35,8 @@ const BentoGrid = () => {
         <section className="py-20 bg-white">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="text-center max-w-2xl mx-auto mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold text-organic-green mb-4">Why Pranto Fruits?</h2>
-                    <p className="text-gray-600">We bridge the gap between rural orchards and your dining table with transparency and excellence.</p>
+                    <h2 className="text-3xl md:text-4xl font-bold text-organic-green mb-4">কেন প্রান্ত ফ্রুটস?</h2>
+                    <p className="text-gray-600">আমরা গ্রামের বাগান থেকে আপনার খাবার টেবিল পর্যন্ত সততা ও উৎকর্ষতার সাথে সেতুবন্ধন তৈরি করি।</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-auto md:grid-rows-3 gap-6 auto-rows-[200px]">

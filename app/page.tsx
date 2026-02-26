@@ -23,19 +23,19 @@ export default async function Home() {
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
               <div className="max-w-xl">
                 <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                  Join the Fresh Revolution. Get 10% Off!
+                  তাজা বিপ্লবে যোগ দিন। ১০% ছাড় পান!
                 </h2>
                 <p className="text-emerald-100/70 text-lg mb-8">
-                  Subscribe to our Fruit Wisdom newsletter and be the first to know about seasonal harvests and exclusive offers.
+                  ফ্রুট ওয়িজডম নিউজলেটারে সাবস্ক্রাইব করুন এবং মৌসুমী ফসল ও বিশেষ অফার সম্পর্কে সবার আগে জানুন।
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 max-w-md">
                   <input
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="আপনার ইমেইল দিন"
                     className="flex-1 bg-white/10 border border-white/20 rounded-full px-6 py-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <button className="bg-primary text-white px-8 py-4 rounded-full font-bold hover:bg-primary-dark transition-all">
-                    Subscribe
+                    সাবস্ক্রাইব করুন
                   </button>
                 </div>
               </div>

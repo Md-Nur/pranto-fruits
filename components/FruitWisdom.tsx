@@ -5,28 +5,28 @@ import { ArrowRight, Clock } from "lucide-react";
 
 const articles = [
     {
-        title: "The Incredible Health Benefits of Green Mango",
-        excerpt: "Green mangoes are not just tasty; they are packed with vitamins and antioxidants that boost immunity.",
+        title: "কাঁচা আমের অবিশ্বাস্য স্বাস্থ্য উপকারিতা",
+        excerpt: "কাঁচা আম শুধু সুস্বাদুই নয়, এতে রয়েছে প্রচুর ভিটামিন ও অ্যান্টিঅক্সিডেন্ট যা রোগ প্রতিরোধ ক্ষমতা বাড়ায়।",
         image: "https://images.unsplash.com/photo-1655168339415-fc5a98a7184f?q=80&w=522&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        date: "May 12, 2024",
-        readTime: "5 min read",
-        tag: "Health"
+        date: "১২ মে, ২০২৪",
+        readTime: "৫ মিনিট পড়া",
+        tag: "স্বাস্থ্য"
     },
     {
-        title: "Why Maryam Dates are the Perfect Superfood",
-        excerpt: "Rich in fiber and natural sugars, dates provide sustained energy for your busy lifestyle.",
+        title: "কেন মরিয়ম খেজুর একটি আদর্শ সুপারফুড",
+        excerpt: "ফাইবার ও প্রাকৃতিক চিনিতে ভরপুর খেজুর আপনার ব্যস্ত জীবনে দীর্ঘস্থায়ী শক্তি জোগায়।",
         image: "https://plus.unsplash.com/premium_photo-1676208753932-6e8bc83a0b0d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        date: "April 28, 2024",
-        readTime: "4 min read",
-        tag: "Nutrition"
+        date: "২৮ এপ্রিল, ২০২৪",
+        readTime: "৪ মিনিট পড়া",
+        tag: "পুষ্টি"
     },
     {
-        title: "Sustainable Farming: Our 2-Step Process",
-        excerpt: "Learn how we ensure our fruits remain 100% chemical-free from harvest to your home.",
+        title: "টেকসই চাষাবাদ: আমাদের ২-ধাপ প্রক্রিয়া",
+        excerpt: "জানুন কীভাবে আমরা ফসল সংগ্রহ থেকে আপনার ঘর পর্যন্ত ১০০% রাসায়নিকমুক্ত রাখি।",
         image: "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?q=80&w=2070&auto=format&fit=crop",
-        date: "April 15, 2024",
-        readTime: "6 min read",
-        tag: "Farming"
+        date: "১৫ এপ্রিল, ২০২৪",
+        readTime: "৬ মিনিট পড়া",
+        tag: "কৃষি"
     }
 ];
 
@@ -36,11 +36,11 @@ const FruitWisdom = () => {
             <div className="container mx-auto px-4 md:px-6">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
                     <div className="max-w-xl">
-                        <h2 className="text-3xl md:text-4xl font-bold text-organic-green mb-4 font-hind-siliguri">ফল বিজ্ঞান: Fruit Wisdom</h2>
-                        <p className="text-gray-600">Discover tips, recipes, and health secrets about the fruits you love.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold text-organic-green mb-4">ফল জ্ঞান ও টিপস</h2>
+                        <p className="text-gray-600">আপনার প্রিয় ফল সম্পর্কে টিপস, রেসিপি এবং স্বাস্থ্যের রহস্য আবিষ্কার করুন।</p>
                     </div>
                     <Link href="/wisdom" className="flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all">
-                        View All Articles <ArrowRight size={20} />
+                        সব নিবন্ধ দেখুন <ArrowRight size={20} />
                     </Link>
                 </div>
 
@@ -70,7 +70,7 @@ const FruitWisdom = () => {
                                     {article.excerpt}
                                 </p>
                                 <button className="text-primary font-bold inline-flex items-center gap-2 group/btn">
-                                    Read More <ArrowRight size={16} className="transition-transform group-hover/btn:translate-x-1" />
+                                    আরও পড়ুন <ArrowRight size={16} className="transition-transform group-hover/btn:translate-x-1" />
                                 </button>
                             </div>
                         </article>
