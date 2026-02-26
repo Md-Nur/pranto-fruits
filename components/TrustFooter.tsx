@@ -97,9 +97,9 @@ const TrustFooter = () => {
                 <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-emerald-100/40">
                     <p>© ২০২৬ প্রান্ত ফ্রুটস লিমিটেড। সর্বস্বত্ব সংরক্ষিত।</p>
                     <div className="flex gap-6">
-                        <a href="#" className="hover:text-primary transition-colors">গোপনীয়তা নীতি</a>
-                        <a href="#" className="hover:text-primary transition-colors">সেবার শর্ত</a>
-                        <a href="#" className="hover:text-primary transition-colors">রিফান্ড নীতি</a>
+                        <Link href="/privacy" className="hover:text-primary transition-colors">গোপনীয়তা নীতি</Link>
+                        <Link href="/terms" className="hover:text-primary transition-colors">সেবার শর্ত</Link>
+                        <Link href="/refund" className="hover:text-primary transition-colors">রিফান্ড নীতি</Link>
                     </div>
                 </div>
             </div>

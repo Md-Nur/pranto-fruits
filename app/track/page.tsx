@@ -5,10 +5,10 @@ import { Search, Package, Truck, CheckCircle2, MapPin, Clock } from "lucide-reac
 import { cn } from "@/lib/utils";
 
 const timelinePositions = [
-    { status: "Processing", date: "Feb 24, 2026", time: "10:30 AM", active: true },
-    { status: "Sorted & Packed", date: "Feb 24, 2026", time: "04:15 PM", active: true },
-    { status: "Out for Delivery", date: "Feb 25, 2026", time: "09:00 AM", active: true },
-    { status: "Delivered", date: "Pending", time: "", active: false },
+    { status: "প্রসেসিং হচ্ছে", date: "২৪ ফেব্রুয়ারি, ২০২৬", time: "সকাল ১০:৩০", active: true },
+    { status: "সর্টেড ও প্যাকড", date: "২৪ ফেব্রুয়ারি, ২০২৬", time: "বিকাল ০৪:১৫", active: true },
+    { status: "ডেলিভারির জন্য বের হয়েছে", date: "২৫ ফেব্রুয়ারি, ২০২৬", time: "সকাল ০৯:০০", active: true },
+    { status: "ডেলিভারি হয়েছে", date: "অপেক্ষমান", time: "", active: false },
 ];
 
 const TrackOrder = () => {
@@ -24,15 +24,15 @@ const TrackOrder = () => {
         <div className="container mx-auto px-4 md:px-6 py-20 min-h-[70vh]">
             <div className="max-w-3xl mx-auto">
                 <div className="text-center mb-12">
-                    <h1 className="text-3xl md:text-5xl font-bold text-organic-green mb-4">Track Your Freshness</h1>
-                    <p className="text-gray-500">Enter your order ID assigned in the confirmation SMS.</p>
+                    <h1 className="text-3xl md:text-5xl font-bold text-organic-green mb-4">আপনার অর্ডার ট্র্যাক করুন</h1>
+                    <p className="text-gray-500">আপনার কনফার্মেশন এসএমএস-এ দেওয়া অর্ডার আইডি লিখুন।</p>
                 </div>
 
                 <form onSubmit={handleTrack} className="flex flex-col sm:flex-row gap-4 mb-16">
                     <div className="flex-1 relative">
                         <input
                             type="text"
-                            placeholder="e.g. PF-987654"
+                            placeholder="উদাঃ PF-987654"
                             value={orderId}
                             onChange={(e) => setOrderId(e.target.value)}
                             className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-5 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-bold text-lg"
@@ -40,7 +40,7 @@ const TrackOrder = () => {
                         <Package size={24} className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300" />
                     </div>
                     <button className="bg-primary text-white px-12 py-5 rounded-2xl font-bold text-lg hover:bg-primary-dark transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2">
-                        <Search size={20} /> Track Now
+                        <Search size={20} /> ট্র্যাক করুন
                     </button>
                 </form>
 
@@ -48,19 +48,19 @@ const TrackOrder = () => {
                     <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl p-8 md:p-12 animate-in fade-in slide-in-from-bottom duration-500">
                         <div className="flex flex-wrap items-center justify-between gap-6 mb-12 pb-8 border-b border-gray-50">
                             <div>
-                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Order Status</p>
+                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">অর্ডার স্ট্যাটাস</p>
                                 <div className="flex items-center gap-2">
                                     <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
-                                    <span className="text-xl font-bold text-organic-green">In Transit</span>
+                                    <span className="text-xl font-bold text-organic-green">পথে আছে</span>
                                 </div>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Expected Delivery</p>
-                                <span className="text-xl font-bold text-organic-green">Feb 25, 2026 (Today)</span>
+                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">সম্ভাব্য ডেলিভারি</p>
+                                <span className="text-xl font-bold text-organic-green">২৫ ফেব্রুয়ারি, ২০২৬ (আজ)</span>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Delivery Partner</p>
-                                <span className="text-xl font-bold text-organic-green">PF Fast Delivery</span>
+                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">ডেলিভারি পার্টনার</p>
+                                <span className="text-xl font-bold text-organic-green">পিএফ ফাস্ট ডেলিভারি</span>
                             </div>
                         </div>
 
@@ -83,7 +83,7 @@ const TrackOrder = () => {
                                             </h4>
                                             {item.active && (
                                                 <p className="text-sm text-gray-500 flex items-center gap-1">
-                                                    <MapPin size={12} /> Dispatched from Rajshahi Hub
+                                                    <MapPin size={12} /> রাজশাহী হাব থেকে বেরিয়েছে
                                                 </p>
                                             )}
                                         </div>
@@ -105,7 +105,7 @@ const TrackOrder = () => {
                                 <Truck className="text-primary" size={24} />
                             </div>
                             <p className="text-sm text-gray-600">
-                                <span className="font-bold">Latest Update:</span> Your package is just 2km away from your delivery location. Please keep your phone reachable.
+                                <span className="font-bold">সর্বশেষ আপডেট:</span> আপনার প্যাকেজটি ডেলিভারি লোকেশন থেকে মাত্র ২ কিমি দূরে আছে। অনুগ্রহ করে আপনার ফোন সচল রাখুন।
                             </p>
                         </div>
                     </div>

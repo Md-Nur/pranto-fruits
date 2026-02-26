@@ -1,4 +1,4 @@
-Search results for "Something" is not functional
+Search bar results for "Something" is not functional
 
 /shop, /checkout, /farmers and /track page are still in English
 
