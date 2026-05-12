@@ -88,7 +88,7 @@ const SocialIntegration = () => {
 
         const story = stories[activeStory];
         const message = encodeURIComponent(`Hi! I'm watching your Garden Story: "${story.title}" and I have a question: `);
-        window.open(`https://wa.me/8801XXXXXXXXX?text=${message}`, "_blank");
+        window.open(`https://wa.me/8801878716088?text=${message}`, "_blank");
     };
 
     return (
@@ -209,7 +209,7 @@ const SocialIntegration = () => {
                     <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
                     <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl" />
 
-                    <div className="container mx-auto px-4 md:px-6 relative">
+                    <div className="w-full px-4 md:px-12 lg:px-20 relative">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16">
                             <div className="flex items-center gap-4">
                                 <div className="w-14 h-14 bg-red-50 relative rounded-2xl flex items-center justify-center overflow-hidden group">
@@ -292,7 +292,7 @@ const SocialIntegration = () => {
                                 Need help choosing the right mangoes or tracking your order? Chat with us now!
                             </p>
                             <a
-                                href="https://wa.me/8801XXXXXXXXX"
+                                href="https://wa.me/8801878716088"
                                 target="_blank"
                                 className="bg-[#25D366] text-white w-full py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-[#20ba59] transition-all"
                             >

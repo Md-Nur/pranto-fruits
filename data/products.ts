@@ -16,6 +16,14 @@ export interface Product {
     isNew?: boolean;
 }
 
+export const categories = [
+    { id: "mango", name: "Mango (আম)" },
+    { id: "dates", name: "Dates (খেজুর)" },
+    { id: "jaggery", name: "Gur (গুড়)" },
+    { id: "honey", name: "Honey (মধু)" },
+    { id: "baskets", name: "Baskets (ঝুড়ি)" }
+];
+
 export const products: Product[] = [
     {
         id: 1,

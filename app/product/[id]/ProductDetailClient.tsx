@@ -11,6 +11,8 @@ import { ProductWithVariants } from "@/components/ProductGrid";
 const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
     const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
     const [quantity, setQuantity] = useState(1);
+    const productImages = (product as any).images?.length > 0 ? (product as any).images : [product.image];
+    const [activeImage, setActiveImage] = useState(productImages[0]);
     const { addToCart } = useCart();
 
     const handleAddToCart = () => {
@@ -33,30 +35,44 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Gallery */}
                 <div className="space-y-4">
-                    <div className="relative aspect-square rounded-[3rem] overflow-hidden bg-surface border border-gray-100 shadow-lg">
+                    <div className="relative aspect-square rounded-[3rem] overflow-hidden bg-surface border border-gray-100 shadow-lg group">
                         <Image
-                            src={product.image}
+                            src={activeImage}
                             alt={product.name}
                             fill
-                            className="object-cover"
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                     </div>
-                    <div className="grid grid-cols-4 gap-4">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-transparent hover:border-primary cursor-pointer transition-all">
-                                <Image src={product.image} alt="Gallery" fill className="object-cover opacity-50 hover:opacity-100" />
-                            </div>
-                        ))}
-                    </div>
+                    {productImages.length > 1 && (
+                        <div className="grid grid-cols-4 gap-4">
+                            {productImages.map((img: string, i: number) => (
+                                <div 
+                                    key={i} 
+                                    onClick={() => setActiveImage(img)}
+                                    className={cn(
+                                        "relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all",
+                                        activeImage === img ? "border-primary shadow-md" : "border-transparent hover:border-primary/50"
+                                    )}
+                                >
+                                    <Image 
+                                        src={img} 
+                                        alt={`Gallery ${i}`} 
+                                        fill 
+                                        className={cn("object-cover transition-opacity", activeImage === img ? "opacity-100" : "opacity-50 hover:opacity-100")} 
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Info */}
                 <div className="flex flex-col">
-                    <span className="text-primary font-bold uppercase tracking-widest text-sm mb-2">{product.category}</span>
-                    <h1 className="text-3xl md:text-5xl font-bold text-organic-green mb-4 leading-tight">{product.name}</h1>
+                    <span className="text-primary font-bold uppercase tracking-widest text-sm mb-2">{product.categoryRef?.name || product.category}</span>
+                    <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h1>
 
                     <div className="flex items-center gap-4 mb-6">
-                        <span className="text-3xl font-black text-organic-green">৳{selectedVariant.price}</span>
+                        <span className="text-3xl font-black text-gray-900">৳{selectedVariant.price}</span>
                         <span className="bg-emerald-50 text-emerald-600 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100">
                             In Stock
                         </span>
@@ -149,13 +165,13 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
             <section className="py-20 mt-12 bg-surface -mx-4 md:-mx-6 px-4 md:px-6 rounded-[3rem]">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex gap-12 border-b border-gray-200 mb-12">
-                        <button className="pb-4 border-b-2 border-primary font-bold text-organic-green">Product Wisdom</button>
+                        <button className="pb-4 border-b-2 border-primary font-bold text-gray-900">Product Wisdom</button>
                         <button className="pb-4 text-gray-400 hover:text-gray-900 transition-colors">Specifications</button>
                         <button className="pb-4 text-gray-400 hover:text-gray-900 transition-colors">Reviews (12)</button>
                     </div>
 
                     <div className="prose prose-emerald max-w-none">
-                        <h3 className="text-2xl font-bold text-organic-green mb-6">Why Choose Our {product.name}?</h3>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-6">Why Choose Our {product.name}?</h3>
                         <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0">
                             {product.details.map((detail, idx) => (
                                 <li key={idx} className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-gray-50">

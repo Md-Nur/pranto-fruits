@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import ProductGrid, { ProductWithVariants } from "@/components/ProductGrid";
+import FruitLoading from "@/components/FruitLoading";
 
-export default function ShopClient({ query }: { query?: string }) {
+export default function ShopClient({ query, category }: { query?: string; category?: string }) {
     const [products, setProducts] = useState<ProductWithVariants[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -11,7 +12,11 @@ export default function ShopClient({ query }: { query?: string }) {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`/api/search?q=${encodeURIComponent(query || "")}`);
+                const params = new URLSearchParams();
+                if (query) params.set("q", query);
+                if (category) params.set("category", category);
+                
+                const res = await fetch(`/api/search?${params.toString()}`);
                 if (!res.ok) throw new Error("Failed to fetch products");
                 const data = await res.json();
                 setProducts(data);
@@ -23,20 +28,24 @@ export default function ShopClient({ query }: { query?: string }) {
         };
 
         fetchProducts();
-    }, [query]);
+    }, [query, category]);
 
     return (
         <div className="container mx-auto px-4 md:px-6 py-12">
             <div className="mb-12">
-                <h1 className="text-4xl font-bold text-organic-green mb-4">
-                    {query ? `"${query}" এর জন্য সার্চ ফলাফল` : "প্রান্তের ফ্রুট শপ"}
+                <h1 className="text-4xl font-bold text-gray-900 mb-4 capitalize">
+                    {query 
+                        ? `Search: "${query}"` 
+                        : category && category !== "all" 
+                            ? `${category} Collection` 
+                            : "Our Fruit Shop"}
                 </h1>
                 <p className="text-gray-500">
-                    আমাদের তাজা, ক্ষতিকারক রাসায়নিক মুক্ত ফলের সংগ্রহ দেখুন।
+                    Explore our collection of fresh, chemical-free fruits delivered from garden to doorstep.
                 </p>
             </div>
             {loading ? (
-                <div className="text-center py-20 text-gray-500">শপ লোড হচ্ছে...</div>
+                <FruitLoading />
             ) : products.length > 0 ? (
                 <ProductGrid products={products} />
             ) : (

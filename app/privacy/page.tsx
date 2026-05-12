@@ -1,8 +1,8 @@
 import React from "react";
 
 export const metadata = {
-    title: "গোপনীয়তা নীতি | Pranto Fruits",
-    description: "প্রাঞ্জ ফ্রুটস এর গোপনীয়তা নীতি",
+    title: "গোপনীয়তা নীতি | Village Organic Fruits",
+    description: "ভিলেজ অর্গানিক ফ্রুটসের গোপনীয়তা নীতি",
 };
 
 export default function PrivacyPolicyPage() {

@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Mail, Lock, Loader2, AlertCircle, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import FruitLoading from "@/components/FruitLoading";
 
 function LoginContent() {
     const router = useRouter();
@@ -170,11 +171,7 @@ function LoginContent() {
 
 export default function LoginPage() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 size={40} className="animate-spin text-primary" />
-            </div>
-        }>
+        <Suspense fallback={<FruitLoading />}>
             <LoginContent />
         </Suspense>
     );

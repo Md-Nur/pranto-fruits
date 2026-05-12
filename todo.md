@@ -1,9 +1,3 @@
-after the order is placed refresh the cart.
+analyeze this website : https://premiumfruitbd.com and make the customer review section as like as this website.customer review must be added by admin. customer review can be youtube url or image. image must be stored in imgbb. in the .env file I provide the imgbb api key.
 
-after add to cart and refresh the page cart item vanishes. why?
-
-there have some loading state that don't use the loading component.
-
-make /farmers page in bengali and make the button register as a farmer functional
-
-make a fully functional dashboard for admin. that can manage products, orders, users, categories, and other controls.
+when admin tries to add/update product he face to give image url which is very annoying. use imgbb api key to upload the imag e and make a direct upload component

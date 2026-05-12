@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Search, Package, Truck, CheckCircle2, MapPin, Clock, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import FruitLoading from "@/components/FruitLoading";
 
 const timelinePositions = [
     { status: "প্রসেসিং হচ্ছে", date: "২৪ ফেব্রুয়ারি, ২০২৬", time: "সকাল ১০:৩০", active: true },
@@ -44,6 +45,8 @@ const TrackOrder = () => {
         if (orderId) setShowResult(true);
     };
 
+    if (loading) return <FruitLoading />;
+    
     return (
         <div className="container mx-auto px-4 md:px-6 py-20 min-h-[70vh]">
             <div className="max-w-3xl mx-auto">
@@ -52,7 +55,7 @@ const TrackOrder = () => {
                     <p className="text-gray-500">আপনার কনফার্মেশন এসএমএস-এ দেওয়া অর্ডার আইডি লিখুন।</p>
                 </div>
 
-                {!loading && orders.length > 0 && (
+                {orders.length > 0 && (
                     <div className="mb-12">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold text-gray-800">আপনার সাম্প্রতিক অর্ডারসমূহ</h2>

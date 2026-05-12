@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export interface CartItem {
     id: number;
@@ -16,6 +16,7 @@ interface CartContextType {
     addToCart: (item: CartItem) => void;
     removeFromCart: (id: number, variant?: string) => void;
     updateQuantity: (id: number, variant: string | undefined, delta: number) => void;
+    clearCart: () => void;
     isCartOpen: boolean;
     setIsCartOpen: (isOpen: boolean) => void;
     cartTotal: number;
@@ -27,6 +28,27 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    // Initialize from localStorage
+    useEffect(() => {
+        const savedCart = localStorage.getItem("cart");
+        if (savedCart) {
+            try {
+                setCart(JSON.parse(savedCart));
+            } catch (e) {
+                console.error("Failed to parse cart from localStorage", e);
+            }
+        }
+        setIsInitialized(true);
+    }, []);
+
+    // Save to localStorage whenever cart changes
+    useEffect(() => {
+        if (isInitialized) {
+            localStorage.setItem("cart", JSON.stringify(cart));
+        }
+    }, [cart, isInitialized]);
 
     const addToCart = (newItem: CartItem) => {
         setCart((prevCart) => {
@@ -61,6 +83,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         );
     };
 
+    const clearCart = () => {
+        setCart([]);
+        localStorage.removeItem("cart");
+    };
+
     const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
     const cartCount = cart.reduce((count, item) => count + item.quantity, 0);
 
@@ -71,6 +98,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
                 addToCart,
                 removeFromCart,
                 updateQuantity,
+                clearCart,
                 isCartOpen,
                 setIsCartOpen,
                 cartTotal,

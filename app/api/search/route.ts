@@ -4,26 +4,31 @@ import prisma from "@/lib/prisma";
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q");
+    const category = searchParams.get("category");
 
     try {
-        let products;
+        const where: any = {};
         
         if (q) {
-            products = await prisma.product.findMany({
-                where: {
-                    OR: [
-                        { name: { contains: q, mode: "insensitive" } },
-                        { description: { contains: q, mode: "insensitive" } },
-                        { category: { contains: q, mode: "insensitive" } },
-                    ]
-                },
-                include: { variants: true }
-            });
-        } else {
-            products = await prisma.product.findMany({
-                include: { variants: true }
-            });
+            where.OR = [
+                { name: { contains: q, mode: "insensitive" } },
+                { description: { contains: q, mode: "insensitive" } },
+            ];
         }
+
+        if (category && category !== "all") {
+            where.categoryRef = {
+                slug: category
+            };
+        }
+
+        const products = await prisma.product.findMany({
+            where,
+            include: { 
+                variants: true,
+                categoryRef: true
+            }
+        });
 
         return NextResponse.json(products);
     } catch (error) {

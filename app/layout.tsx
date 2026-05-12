@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Hind_Siliguri } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import TrustFooter from "@/components/TrustFooter";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
-import CartSideOver from "@/components/CartSideOver";
-import SocialIntegration from "@/components/SocialIntegration";
+import PublicLayout from "../components/PublicLayout";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -20,8 +17,8 @@ const hindSiliguri = Hind_Siliguri({
 });
 
 export const metadata: Metadata = {
-  title: "Pranto Fruits Ltd. | High-Quality Fresh Fruits",
-  description: "Experience the finest seasonal fruits delivered straight from the garden with Pranto Fruits Ltd.",
+  title: "Village Organic Fruits | High-Quality Fresh Fruits",
+  description: "Experience the finest seasonal fruits delivered straight from the garden with Village Organic Fruits.",
 };
 
 export default function RootLayout({
@@ -37,15 +34,9 @@ export default function RootLayout({
       >
         <CartProvider>
           <WishlistProvider>
-            <div className="page-container relative">
-              <Navbar />
-              <main className="pt-20">
-                {children}
-              </main>
-              <CartSideOver />
-              <SocialIntegration />
-              <TrustFooter />
-            </div>
+            <PublicLayout>
+              {children}
+            </PublicLayout>
           </WishlistProvider>
         </CartProvider>
       </body>

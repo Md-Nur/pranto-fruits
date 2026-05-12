@@ -1,8 +1,8 @@
 import React from "react";
 
 export const metadata = {
-    title: "সেবার শর্ত | Pranto Fruits",
-    description: "প্রাঞ্জ ফ্রুটস এর সেবার শর্ত",
+    title: "সেবার শর্ত | Village Organic Fruits",
+    description: "ভিলেজ অর্গানিক ফ্রুটসের সেবার শর্ত",
 };
 
 export default function TermsOfServicePage() {

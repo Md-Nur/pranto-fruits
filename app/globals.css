@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #10b981;
-  --color-primary-dark: #059669;
+  --color-primary: #2f5d62;
+  --color-primary-dark: #1e3e41;
   --color-accent: #f59e0b;
-  --color-earth-brown: #78350f;
-  --color-organic-green: #064e3b;
-  --color-surface: #f9fafb;
+  --color-brand-green: #25d366;
+  --color-organic-green: #2f5d62;
+  --color-surface: #f8f9fa;
 
   --font-inter: var(--font-inter);
   --font-hind-siliguri: var(--font-hind-siliguri);
@@ -50,12 +50,20 @@ h6,
 }
 
 .page-container {
-  max-width: 1440px;
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
   background-color: var(--background);
   min-height: 100vh;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 3s infinite ease-in-out;
 }
 
 @media (min-width: 1441px) {

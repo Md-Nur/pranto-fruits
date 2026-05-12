@@ -1,0 +1,38 @@
+import { cookies } from "next/headers";
+import { verifyJwt } from "@/lib/jwt-utils";
+import prisma from "@/lib/prisma";
+
+export async function verifyAdmin() {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth-token")?.value;
+
+    if (!token) {
+        return { error: "Unauthorized", status: 401, user: null };
+    }
+
+    const payload = await verifyJwt(token);
+
+    if (!payload || !payload.id) {
+        return { error: "Invalid token", status: 401, user: null };
+    }
+
+    const user = await prisma.user.findUnique({
+        where: { id: payload.id as number },
+        select: {
+            id: true,
+            name: true,
+            phone: true,
+            role: true,
+        },
+    });
+
+    if (!user) {
+        return { error: "User not found", status: 401, user: null };
+    }
+
+    if (user.role !== "ADMIN") {
+        return { error: "Forbidden: Admin access required", status: 403, user: null };
+    }
+
+    return { error: null, status: 200, user };
+}

@@ -6,9 +6,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { ArrowLeft, CheckCircle2, ChevronRight, CreditCard, Truck, Loader2, AlertCircle } from "lucide-react";
+import FruitLoading from "@/components/FruitLoading";
 
 export default function CheckoutPage() {
-    const { cart, cartTotal } = useCart();
+    const { cart, cartTotal, clearCart } = useCart();
     const router = useRouter();
     const [step, setStep] = useState(1); // 1: Shipping, 2: Payment, 3: Success
     const [isLoading, setIsLoading] = useState(false);
@@ -104,6 +105,8 @@ export default function CheckoutPage() {
                 // Non-critical: ignore profile save errors
             }
 
+            // Clear the cart after successful order
+            clearCart();
             setStep(3);
         } catch (err: any) {
             setError(err.message);
@@ -113,11 +116,7 @@ export default function CheckoutPage() {
     };
 
     if (isCheckingAuth) {
-        return (
-            <div className="min-h-[60vh] flex items-center justify-center">
-                <Loader2 size={40} className="animate-spin text-primary" />
-            </div>
-        );
+        return <FruitLoading />;
     }
 
     if (cart.length === 0 && step !== 3) {

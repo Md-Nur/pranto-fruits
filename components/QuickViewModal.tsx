@@ -75,9 +75,9 @@ const QuickViewModal = ({ product, onClose }: QuickViewModalProps) => {
                             {/* Product Info */}
                             <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
                                 <span className="text-primary font-bold uppercase tracking-widest text-xs mb-2">
-                                    {product.category}
+                                    {product.categoryRef?.name || product.category}
                                 </span>
-                                <h2 className="text-3xl md:text-4xl font-black text-organic-green mb-4">
+                                <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
                                     {product.name}
                                 </h2>
 

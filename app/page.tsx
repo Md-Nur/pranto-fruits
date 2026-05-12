@@ -1,60 +1,145 @@
-import HeroCarousel from "@/components/HeroCarousel";
-import BentoGrid from "@/components/BentoGrid";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, Star, ShieldCheck, Truck, Leaf, Play, MapPin } from "lucide-react";
 import ProductGrid from "@/components/ProductGrid";
-import FruitWisdom from "@/components/FruitWisdom";
+import CategoryBar from "@/components/CategoryBar";
+import CustomerReviews from "@/components/CustomerReviews";
 import prisma from "@/lib/prisma";
 
 export default async function Home() {
-  const products = await prisma.product.findMany({
-    include: { variants: true },
-  });
+    const products = await prisma.product.findMany({
+        include: { 
+            variants: true,
+            categoryRef: true
+        },
+        take: 8,
+    });
 
-  return (
-    <div className="flex flex-col gap-0 overflow-hidden">
-      <HeroCarousel />
-      <BentoGrid />
-      <ProductGrid products={products} />
-      <FruitWisdom />
-
-      {/* Newsletter / CTA Section */}
-      <section className="py-20 bg-primary/5">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="bg-organic-green rounded-[3rem] p-8 md:p-16 relative overflow-hidden text-center md:text-left">
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
-              <div className="max-w-xl">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                   প্রান্ত ফ্রুটস কমিউনিটিতে যোগ দিন
-                </h2>
-                <p className="text-emerald-100/70 text-lg mb-8">
-                   আমাদের নিউজলেটারে সাবস্ক্রাইব করুন এবং মৌসুমী ফসল ও বিশেষ অফার সম্পর্কে সবার আগে জানুন।
-                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 max-w-md">
-                  <input
-                    type="email"
-                    placeholder="আপনার ইমেইল দিন"
-                    className="flex-1 bg-white/10 border border-white/20 rounded-full px-6 py-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <button className="bg-primary text-white px-8 py-4 rounded-full font-bold hover:bg-primary-dark transition-all">
-                    সাবস্ক্রাইব করুন
-                  </button>
+    return (
+        <div className="flex flex-col gap-0 overflow-hidden">
+            {/* New Premium Hero Section */}
+            <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+                {/* Background Image with Overlay */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src="/premium_garden_hero_bg_1778617597667.png"
+                        alt="Fruit Orchard"
+                        fill
+                        className="object-cover"
+                        priority
+                    />
+                    <div className="absolute inset-0 bg-black/40" />
                 </div>
-              </div>
-              <div className="hidden lg:block relative w-80 h-80">
-                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-                <img
-                  src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?q=80&w=500&auto=format&fit=crop"
-                  alt="Fresh Fruit"
-                  className="relative z-10 w-full h-full object-contain drop-shadow-2xl"
-                />
-              </div>
-            </div>
 
-            {/* Abstract Shapes */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/10 rounded-full translate-y-1/2 -translate-x-1/2" />
-          </div>
+                {/* Hero Content */}
+                <div className="w-full px-4 md:px-12 lg:px-20 relative z-10 text-center">
+                    <div className="max-w-4xl mx-auto">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                            Village Organic Fruits Ltd.
+                        </h1>
+                        <p className="text-xl md:text-2xl text-white/90 mb-10 leading-relaxed font-medium">
+                            A fruit-only agri initiative delivering safer fruits directly from gardens to your doorstep.
+                        </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <Link
+                                href="/gardens"
+                                className="w-full sm:w-auto px-10 py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark transition-all shadow-xl text-lg flex items-center justify-center gap-2"
+                            >
+                                Our Contracted Gardens
+                            </Link>
+                            <Link
+                                href="/shop"
+                                className="w-full sm:w-auto px-10 py-4 bg-white/20 backdrop-blur-md text-white border border-white/40 font-bold rounded-lg hover:bg-white hover:text-primary transition-all text-lg flex items-center justify-center gap-2"
+                            >
+                                <Play size={20} className="fill-current" />
+                                Try our fruits
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bottom decorative wave or fade */}
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-[1]" />
+            </section>
+
+            {/* Overlapping Category Bar */}
+            <CategoryBar />
+
+            {/* Featured Products */}
+            <section className="py-24 bg-white">
+                <div className="container mx-auto px-4 md:px-8">
+                    <div className="flex flex-col items-center mb-16 text-center">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="h-1 w-8 bg-primary rounded-full"></div>
+                            <span className="text-primary font-bold uppercase tracking-widest text-sm">Best Sellers</span>
+                            <div className="h-1 w-8 bg-primary rounded-full"></div>
+                        </div>
+                        <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">ALL PRODUCTS</h2>
+                        <div className="w-24 h-1.5 bg-gray-100 rounded-full relative overflow-hidden">
+                            <div className="absolute inset-0 bg-primary w-1/2 animate-pulse"></div>
+                        </div>
+                    </div>
+
+                    <ProductGrid products={products} />
+
+                    <div className="mt-16 text-center">
+                        <Link
+                            href="/shop"
+                            className="inline-flex items-center gap-3 px-12 py-4 bg-gray-900 text-white font-bold rounded-full hover:bg-primary transition-all shadow-xl group text-lg"
+                        >
+                            Shop Now
+                            <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* Customer Reviews Section */}
+            <CustomerReviews />
+
+            {/* Trust Indicators Section (New) */}
+            <section className="py-20 bg-surface border-y border-gray-100">
+                <div className="container mx-auto px-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-white rounded-2xl shadow-md flex items-center justify-center mb-6 text-primary group hover:bg-primary hover:text-white transition-all duration-300">
+                                <ShieldCheck size={36} />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3">Safe Garden</h3>
+                            <p className="text-gray-500 text-sm leading-relaxed">
+                                Experience how we collect fresh fruits directly from our registered gardens.
+                            </p>
+                        </div>
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-white rounded-2xl shadow-md flex items-center justify-center mb-6 text-primary group hover:bg-primary hover:text-white transition-all duration-300">
+                                <Leaf size={36} />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3">Premium Quality</h3>
+                            <p className="text-gray-500 text-sm leading-relaxed">
+                                We ensure every fruit is packed with care to maintain its premium quality.
+                            </p>
+                        </div>
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-white rounded-2xl shadow-md flex items-center justify-center mb-6 text-primary group hover:bg-primary hover:text-white transition-all duration-300">
+                                <Truck size={36} />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3">Garden to Door</h3>
+                            <p className="text-gray-500 text-sm leading-relaxed">
+                                Fast and reliable delivery service ensuring freshness right to your doorstep.
+                            </p>
+                        </div>
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-white rounded-2xl shadow-md flex items-center justify-center mb-6 text-primary group hover:bg-primary hover:text-white transition-all duration-300">
+                                <Star size={36} />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3">50K+ Customers</h3>
+                            <p className="text-gray-500 text-sm leading-relaxed">
+                                Trusted by thousands of happy families across Bangladesh.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-      </section>
-    </div>
-  );
+    );
 }

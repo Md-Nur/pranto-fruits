@@ -1,8 +1,8 @@
 import React from "react";
 
 export const metadata = {
-    title: "রিফান্ড পলিসি | Pranto Fruits",
-    description: "প্রাঞ্জ ফ্রুটস এর রিফান্ড পলিসি",
+    title: "রিফান্ড পলিসি | Village Organic Fruits",
+    description: "ভিলেজ অর্গানিক ফ্রুটসের রিফান্ড পলিসি",
 };
 
 export default function RefundPolicyPage() {
