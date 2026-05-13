@@ -37,7 +37,7 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
             image: product.image,
             quantity: quantity,
             variant: selectedVariant.label
-        });
+        }, false);
         router.push("/checkout");
     };
 

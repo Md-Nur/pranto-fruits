@@ -6,6 +6,7 @@ import { MessageCircle, X, Youtube, Play, ArrowRight, ChevronLeft, ChevronRight,
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 const getVideoId = (videoUrl: string) => {
     return videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|shorts\/|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
@@ -292,7 +293,7 @@ const SocialIntegration = () => {
                     rel="noopener noreferrer"
                     className="hidden md:flex w-16 h-16 rounded-full items-center justify-center text-white bg-[#25D366] shadow-2xl transition-all transform hover:scale-110"
                 >
-                    <MessageCircle size={32} />
+                    <WhatsAppIcon size={32} />
                     {/* Badge */}
                     <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 border-2 border-white rounded-full text-[10px] font-bold flex items-center justify-center animate-bounce">1</span>
                 </a>
@@ -304,7 +305,7 @@ const SocialIntegration = () => {
                     rel="noopener noreferrer"
                     className="md:hidden w-14 h-14 rounded-full bg-[#25D366] flex items-center justify-center text-white shadow-2xl transition-all transform hover:scale-110"
                 >
-                    <MessageCircle size={28} />
+                    <WhatsAppIcon size={28} />
                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-white rounded-full text-[9px] font-bold flex items-center justify-center animate-bounce">1</span>
                 </a>
             </div>

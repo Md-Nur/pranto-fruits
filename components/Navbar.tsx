@@ -113,6 +113,7 @@ const Navbar = () => {
                         <Link href="/gifts" className="text-sm font-bold hover:text-accent transition-colors">Gifts</Link>
                         <Link href="/wisdom" className="text-sm font-bold hover:text-accent transition-colors">Wisdom</Link>
                         <Link href="/about" className="text-sm font-bold hover:text-accent transition-colors">About</Link>
+                        <Link href="/farmers" className="text-sm font-bold hover:text-accent transition-colors">Farmers</Link>
                         <Link href="/contact" className="text-sm font-bold hover:text-accent transition-colors">Contact</Link>
                         <Link href="/track" className="text-sm font-bold hover:text-accent transition-colors flex items-center gap-1.5">
                             <MapPin size={16} /> Track Order
@@ -253,6 +254,7 @@ const Navbar = () => {
                         <Link href="/gifts" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Gifts</Link>
                         <Link href="/wisdom" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Wisdom</Link>
                         <Link href="/about" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>About</Link>
+                        <Link href="/farmers" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Farmers</Link>
                         <Link href="/contact" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
                         <Link href="/track" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Track Order</Link>
                         {user?.role === "ADMIN" && (

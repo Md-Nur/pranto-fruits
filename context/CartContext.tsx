@@ -13,7 +13,7 @@ export interface CartItem {
 
 interface CartContextType {
     cart: CartItem[];
-    addToCart: (item: CartItem) => void;
+    addToCart: (item: CartItem, openCart?: boolean) => void;
     removeFromCart: (id: number, variant?: string) => void;
     updateQuantity: (id: number, variant: string | undefined, delta: number) => void;
     clearCart: () => void;
@@ -50,7 +50,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         }
     }, [cart, isInitialized]);
 
-    const addToCart = (newItem: CartItem) => {
+    const addToCart = (newItem: CartItem, openCart: boolean = true) => {
         setCart((prevCart) => {
             const existingItemIndex = prevCart.findIndex(
                 (item) => item.id === newItem.id && item.variant === newItem.variant
@@ -64,7 +64,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
             return [...prevCart, newItem];
         });
-        setIsCartOpen(true);
+        if (openCart) {
+            setIsCartOpen(true);
+        }
     };
 
     const removeFromCart = (id: number, variant?: string) => {

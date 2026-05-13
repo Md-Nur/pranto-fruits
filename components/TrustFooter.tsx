@@ -50,6 +50,7 @@ const TrustFooter = () => {
                             <li><Link href="/shop" className="hover:text-primary transition-colors font-medium">All Fruits</Link></li>
                             <li><Link href="/gifts" className="hover:text-primary transition-colors font-medium">Corporate Gifting</Link></li>
                             <li><Link href="/about" className="hover:text-primary transition-colors font-medium">About Us</Link></li>
+                            <li><Link href="/farmers" className="hover:text-primary transition-colors font-medium">Our Farmers</Link></li>
                             <li><Link href="/contact" className="hover:text-primary transition-colors font-medium">Contact Us</Link></li>
                             <li><Link href="/terms" className="hover:text-primary transition-colors font-medium">Terms & Conditions</Link></li>
                         </ul>

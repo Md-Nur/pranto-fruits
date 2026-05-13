@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MessageCircle } from "lucide-react";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 const WhatsAppButton = () => {
     const phoneNumber = "01878716088";
@@ -18,7 +18,7 @@ const WhatsAppButton = () => {
                 <span className="text-sm font-bold text-gray-700 whitespace-nowrap">Chat on WhatsApp</span>
             </div>
             <div className="w-16 h-16 bg-brand-green text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform duration-300 animate-bounce-subtle">
-                <MessageCircle size={32} fill="currentColor" />
+                <WhatsAppIcon size={32} />
             </div>
         </a>
     );

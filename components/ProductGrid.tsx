@@ -65,7 +65,7 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
             image: product.image,
             quantity: 1,
             variant: product.variants[0]?.label
-        });
+        }, false);
         router.push("/checkout");
     };
 
