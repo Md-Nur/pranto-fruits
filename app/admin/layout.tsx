@@ -7,7 +7,7 @@ import AdminHeader from "@/components/admin/AdminHeader";
 import { cn } from "@/lib/utils";
 import FruitLoading from "@/components/FruitLoading";
 
-const pageTitles: Record<string, { title: string; subtitle: string }> = {
+const pageTitles: Record<string, { title: string; subtitle: string; icon?: string }> = {
     "/admin": { title: "Dashboard", subtitle: "Overview & Analytics" },
     "/admin/products": { title: "Products", subtitle: "Manage your product catalog" },
     "/admin/orders": { title: "Orders", subtitle: "Track and manage orders" },

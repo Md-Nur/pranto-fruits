@@ -5,7 +5,7 @@ import { verifyJwt } from "@/lib/jwt-utils";
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
@@ -18,7 +18,7 @@ export async function PUT(
         }
 
         const data = await request.json();
-        const id = parseInt(params.id);
+        const id = parseInt((await params).id);
 
         const story = await prisma.gardenStory.update({
             where: { id },
@@ -38,7 +38,7 @@ export async function PUT(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
@@ -50,7 +50,7 @@ export async function DELETE(
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        const id = parseInt(params.id);
+        const id = parseInt((await params).id);
         await prisma.gardenStory.delete({
             where: { id }
         });
