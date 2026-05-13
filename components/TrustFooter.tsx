@@ -1,7 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, MessageCircle, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 const TrustFooter = () => {
     return (
@@ -31,8 +32,8 @@ const TrustFooter = () => {
                             <a href="https://facebook.com/villageorganicfruits" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
                                 <Facebook size={18} />
                             </a>
-                            <a href="https://wa.me/8801878716088" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all">
-                                <MessageCircle size={18} />
+                            <a href="https://wa.me/8801878716088" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
+                                <WhatsAppIcon size={18} />
                             </a>
                             <a href="https://youtube.com/@villageorganicfruits" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
                                 <Youtube size={18} />
