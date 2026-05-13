@@ -71,6 +71,7 @@ const CartSideOver = () => {
                                                     src={item.image}
                                                     alt={item.name}
                                                     fill
+                                                    sizes="96px"
                                                     className="object-cover"
                                                 />
                                             </div>
@@ -126,9 +127,13 @@ const CartSideOver = () => {
                                 <Link href="/checkout" onClick={() => setIsCartOpen(false)} className="w-full bg-primary text-white py-4 rounded-full font-bold text-lg hover:bg-primary-dark transition-all flex items-center justify-center gap-2 group shadow-xl shadow-primary/20">
                                     Checkout Now <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
-                                <div className="mt-4 flex items-center justify-center gap-4 grayscale opacity-50">
-                                    <img src="https://images.seeklogo.com/logo-png/38/1/bkash-logo-png_seeklogo-382709.png" alt="bkash" className="h-4" />
-                                    <img src="https://www.logo.wine/a/logo/Nagad/Nagad-Logo.wine.svg" alt="nagad" className="h-4" />
+                                <div className="mt-4 flex items-center justify-center gap-4 grayscale opacity-50 relative h-6">
+                                    <div className="relative h-4 w-12">
+                                        <Image src="https://images.seeklogo.com/logo-png/38/1/bkash-logo-png_seeklogo-382709.png" alt="bkash" fill sizes="48px" className="object-contain" />
+                                    </div>
+                                    <div className="relative h-4 w-12">
+                                        <Image src="https://www.logo.wine/a/logo/Nagad/Nagad-Logo.wine.svg" alt="nagad" fill sizes="48px" className="object-contain" />
+                                    </div>
                                 </div>
                             </div>
                         )}

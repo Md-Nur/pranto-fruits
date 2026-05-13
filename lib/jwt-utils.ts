@@ -1,7 +1,13 @@
 import { SignJWT, jwtVerify } from "jose";
 
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET && process.env.NODE_ENV === "production") {
+    throw new Error("JWT_SECRET is not set in production environment!");
+}
+
 const secret = new TextEncoder().encode(
-    process.env.JWT_SECRET || "default_secret_for_development_only"
+    JWT_SECRET || "dev_secret_only_for_local_use_never_use_in_prod"
 );
 
 export async function signJwt(payload: any) {

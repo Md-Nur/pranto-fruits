@@ -24,21 +24,26 @@ const Navbar = () => {
         };
         window.addEventListener("scroll", handleScroll);
 
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    useEffect(() => {
         const checkAuth = async () => {
             try {
                 const res = await fetch("/api/auth/check");
                 const data = await res.json();
                 if (data.authenticated) {
                     setUser(data.user);
+                } else {
+                    setUser(null);
                 }
             } catch (err) {
                 console.error("Auth check failed", err);
+                setUser(null);
             }
         };
         checkAuth();
-
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+    }, [pathname]);
 
     const handleLogout = async () => {
         try {
@@ -73,11 +78,11 @@ const Navbar = () => {
                     : "bg-transparent py-5"
             )}
         >
-            <div className="w-full px-4 md:px-12 lg:px-20">
-                <div className="flex items-center justify-between">
+            <div className="w-full px-3 md:px-12 lg:px-20">
+                <div className="flex items-center justify-between gap-2">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-3 group">
-                        <div className="relative w-12 h-12 transition-transform duration-300 group-hover:scale-105">
+                    <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink min-w-0">
+                        <div className="relative w-9 h-9 sm:w-12 sm:h-12 shrink-0 transition-transform duration-300 group-hover:scale-105">
                             <Image
                                 src="/logo.png"
                                 alt="Village Organic Fruits"
@@ -86,13 +91,13 @@ const Navbar = () => {
                                 priority
                             />
                         </div>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col min-w-0 shrink">
                             <span className={cn(
-                                "font-bold text-xl leading-none transition-colors duration-300",
+                                "font-bold text-sm sm:text-xl leading-tight sm:leading-none transition-colors duration-300 truncate",
                                 brandColor
                             )}>Village Organic Fruits</span>
                             <span className={cn(
-                                "text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300",
+                                "text-[9px] sm:text-[10px] font-bold tracking-widest sm:tracking-[0.2em] uppercase transition-colors duration-300 truncate hidden sm:block",
                                 showTransparent ? "text-white/70" : "text-primary/60"
                             )}>Pure & Healthy</span>
                         </div>
@@ -107,13 +112,15 @@ const Navbar = () => {
                         <Link href="/shop" className="text-sm font-bold hover:text-accent transition-colors">Shop</Link>
                         <Link href="/gifts" className="text-sm font-bold hover:text-accent transition-colors">Gifts</Link>
                         <Link href="/wisdom" className="text-sm font-bold hover:text-accent transition-colors">Wisdom</Link>
+                        <Link href="/about" className="text-sm font-bold hover:text-accent transition-colors">About</Link>
+                        <Link href="/contact" className="text-sm font-bold hover:text-accent transition-colors">Contact</Link>
                         <Link href="/track" className="text-sm font-bold hover:text-accent transition-colors flex items-center gap-1.5">
                             <MapPin size={16} /> Track Order
                         </Link>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-3 md:gap-6">
+                    <div className="flex items-center gap-1.5 sm:gap-3 md:gap-6 shrink-0">
                         <button
                             className={cn(
                                 "p-2 transition-colors md:hidden",
@@ -245,6 +252,8 @@ const Navbar = () => {
                         <Link href="/shop" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Shop</Link>
                         <Link href="/gifts" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Gifts</Link>
                         <Link href="/wisdom" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Wisdom</Link>
+                        <Link href="/about" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>About</Link>
+                        <Link href="/contact" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
                         <Link href="/track" className="text-lg font-medium py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Track Order</Link>
                         {user?.role === "ADMIN" && (
                             <Link href="/admin" className="bg-emerald-500 text-white p-3 rounded-xl text-center font-bold" onClick={() => setMobileMenuOpen(false)}>Admin Dashboard</Link>

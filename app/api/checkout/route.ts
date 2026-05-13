@@ -8,20 +8,20 @@ export async function POST(req: Request) {
         const cookieStore = await cookies();
         const token = cookieStore.get("auth-token")?.value;
 
-        if (!token) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        let userId: number | null = null;
 
-        const payload = await verifyJwt(token);
-        if (!payload || !payload.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        if (token) {
+            const payload = await verifyJwt(token);
+            if (payload && payload.id) {
+                userId = payload.id as number;
+            }
         }
 
         const { totalAmount, paymentMethod, shippingInfo, orderItems } = await req.json();
 
         const order = await prisma.order.create({
             data: {
-                userId: payload.id as number,
+                ...(userId ? { userId } : {}),
                 totalAmount,
                 paymentMethod,
                 shippingInfo,

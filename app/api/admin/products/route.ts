@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { verifyAdmin } from "@/lib/admin-auth";
 import prisma from "@/lib/prisma";
+import { productSchema } from "@/lib/validation";
 
 export async function GET(req: Request) {
     try {
+        // Auth is now handled by middleware, but we can still use verifyAdmin for user info if needed
         const auth = await verifyAdmin();
         if (auth.error) {
             return NextResponse.json({ error: auth.error }, { status: auth.status });
@@ -45,17 +47,21 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const { name, categoryId, basePrice, priceRange, description, image, images, details, isNew, variants } = body;
+        const validation = productSchema.safeParse(body);
 
-        if (!name || !categoryId || basePrice === undefined || !description || (!image && (!images || images.length === 0))) {
-            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        if (!validation.success) {
+            return NextResponse.json({ 
+                error: validation.error.issues[0].message 
+            }, { status: 400 });
         }
+
+        const { name, categoryId, basePrice, priceRange, description, image, images, details, isNew, variants } = validation.data;
 
         const product = await prisma.product.create({
             data: {
                 name,
-                categoryId: parseInt(categoryId.toString()),
-                basePrice: parseFloat(basePrice),
+                categoryId: categoryId,
+                basePrice: basePrice,
                 priceRange: priceRange || String(basePrice),
                 description,
                 image: image || (images && images.length > 0 ? images[0] : ""),
@@ -65,7 +71,7 @@ export async function POST(req: Request) {
                 variants: {
                     create: (variants || []).map((v: any) => ({
                         label: v.label,
-                        price: parseFloat(v.price),
+                        price: v.price,
                     })),
                 },
             },

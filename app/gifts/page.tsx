@@ -2,9 +2,56 @@
 
 import React from "react";
 import Image from "next/image";
-import { Gift, Building2, Send, CheckCircle2 } from "lucide-react";
+import { Gift, Building2, Send, CheckCircle2, Loader2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const CorporateGifting = () => {
+    const [loading, setLoading] = React.useState(false);
+    const [formData, setFormData] = React.useState({
+        companyName: "",
+        contactPerson: "",
+        email: "",
+        phone: "",
+        details: "",
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const res = await fetch("/api/inquiries", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                toast.success("আপনার ইনকোয়ারি সফলভাবে সাবমিট করা হয়েছে!");
+                setFormData({
+                    companyName: "",
+                    contactPerson: "",
+                    email: "",
+                    phone: "",
+                    details: "",
+                });
+            } else {
+                toast.error(data.error || "কিছু ভুল হয়েছে");
+            }
+        } catch (error) {
+            toast.error("সার্ভার ত্রুটি, দয়া করে আবার চেষ্টা করুন");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
     return (
         <div className="flex flex-col">
             {/* Hero Section */}
@@ -58,30 +105,80 @@ const CorporateGifting = () => {
                                 <p className="text-gray-500">আপনার কী প্রয়োজন তা আমাদের জানান এবং আমাদের প্রতিনিধি ২ ঘণ্টার মধ্যে আপনার সাথে যোগাযোগ করবে।</p>
                             </div>
 
-                            <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="flex flex-col gap-2">
                                     <label className="text-sm font-bold text-gray-700">কোম্পানির নাম</label>
-                                    <input type="text" placeholder="উদাঃ এবিসি কর্পোরেশন" className="bg-white border border-gray-200 rounded-2xl p-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
+                                    <input
+                                        type="text"
+                                        name="companyName"
+                                        value={formData.companyName}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="উদাঃ এবিসি কর্পোরেশন"
+                                        className="bg-white border border-gray-200 rounded-2xl p-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <label className="text-sm font-bold text-gray-700">যোগাযোগের ব্যক্তি</label>
-                                    <input type="text" placeholder="আপনার নাম" className="bg-white border border-gray-200 rounded-2xl p-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
+                                    <input
+                                        type="text"
+                                        name="contactPerson"
+                                        value={formData.contactPerson}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="আপনার নাম"
+                                        className="bg-white border border-gray-200 rounded-2xl p-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <label className="text-sm font-bold text-gray-700">ইমেইল ঠিকানা</label>
-                                    <input type="email" placeholder="work@company.com" className="bg-white border border-gray-200 rounded-2xl p-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="work@company.com"
+                                        className="bg-white border border-gray-200 rounded-2xl p-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <label className="text-sm font-bold text-gray-700">ফোন নম্বর</label>
-                                    <input type="tel" placeholder="+880 1..." className="bg-white border border-gray-200 rounded-2xl p-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="+880 1..."
+                                        className="bg-white border border-gray-200 rounded-2xl p-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                    />
                                 </div>
                                 <div className="md:col-span-2 flex flex-col gap-2">
                                     <label className="text-sm font-bold text-gray-700">আনুমানিক পরিমাণ এবং আপনার বিস্তারিত প্রয়োজন</label>
-                                    <textarea rows={4} placeholder="আপনার কী ধরণের ফল এবং কয়টি বাক্স প্রয়োজন?" className="bg-white border border-gray-200 rounded-3xl p-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none"></textarea>
+                                    <textarea
+                                        rows={4}
+                                        name="details"
+                                        value={formData.details}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="আপনার কী ধরণের ফল এবং কয়টি বাক্স প্রয়োজন?"
+                                        className="bg-white border border-gray-200 rounded-3xl p-4 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none"
+                                    ></textarea>
                                 </div>
                                 <div className="md:col-span-2 mt-4">
-                                    <button type="button" className="w-full bg-organic-green text-white py-5 rounded-full font-bold text-lg hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-xl shadow-organic-green/20">
-                                        <Send size={20} /> সাবমিট করুন
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full bg-organic-green text-white py-5 rounded-full font-bold text-lg hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-xl shadow-organic-green/20 disabled:opacity-70"
+                                    >
+                                        {loading ? (
+                                            <Loader2 size={20} className="animate-spin" />
+                                        ) : (
+                                            <>
+                                                <Send size={20} /> সাবমিট করুন
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </form>

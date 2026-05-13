@@ -2,6 +2,7 @@
 
 import React from "react";
 import { X, Phone, MapPin, Mail, CreditCard, Package } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
@@ -115,7 +116,9 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusUpdate }: OrderDetai
                                 {items.map((item: any, idx: number) => (
                                     <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                                         {item.image && (
-                                            <img src={item.image} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" />
+                                            <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                                <Image src={item.image} alt={item.name} fill sizes="40px" className="object-cover" />
+                                            </div>
                                         )}
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium text-gray-900 truncate">{item.name || "Product"}</p>

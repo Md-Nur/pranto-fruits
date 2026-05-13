@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { ShoppingCart, Heart, Eye, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
@@ -30,6 +31,7 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
     const [selectedProduct, setSelectedProduct] = useState<ProductWithVariants | null>(null);
     const { addToCart } = useCart();
     const { toggleWishlist, isInWishlist } = useWishlist();
+    const router = useRouter();
 
     // Derive dynamic categories from products
     const uniqueCategories = [
@@ -53,6 +55,18 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
             quantity: 1,
             variant: product.variants[0]?.label
         });
+    };
+
+    const handleBuyNow = (product: ProductWithVariants) => {
+        addToCart({
+            id: product.id,
+            name: product.name,
+            price: product.basePrice,
+            image: product.image,
+            quantity: 1,
+            variant: product.variants[0]?.label
+        });
+        router.push("/checkout");
     };
 
     return (
@@ -79,16 +93,18 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {filteredProducts.map((product) => (
-                        <div key={product.id} className="group flex flex-col">
-                            <div className="relative aspect-square rounded-3xl overflow-hidden bg-surface mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+                    {filteredProducts.map((product, index) => (
+                        <div key={product.id} className="group flex flex-col bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden p-3">
+                            <div className="relative aspect-square rounded-2xl overflow-hidden bg-surface mb-4">
                                 <Link href={`/product/${product.id}`}>
                                     <Image
                                         src={product.image}
                                         alt={product.name}
                                         fill
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                                         className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                        priority={index < 4}
                                     />
                                 </Link>
 
@@ -122,7 +138,7 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
                                     </button>
                                 </div>
 
-                                <div className="absolute bottom-4 left-4 right-4 sm:translate-y-14 sm:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                                <div className="hidden sm:block absolute bottom-4 left-4 right-4 translate-y-14 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                                     <button
                                         onClick={() => handleAddToCart(product)}
                                         className="w-full bg-white text-primary font-bold py-3 rounded-2xl shadow-xl hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-2"
@@ -132,19 +148,19 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-1 px-2">
-                                <span className="text-primary text-xs font-bold uppercase tracking-widest">{product.categoryRef?.name || product.category}</span>
-                                <h3 className="font-bold text-lg text-gray-900 group-hover:text-primary transition-colors line-clamp-1">
+                            <div className="flex flex-col gap-1.5 px-3 pb-3 pt-1">
+                                <span className="text-primary text-[10px] font-bold uppercase tracking-widest">{product.categoryRef?.name || product.category}</span>
+                                <h3 className="font-bold text-base sm:text-lg text-gray-900 group-hover:text-primary transition-colors line-clamp-1 leading-snug">
                                     <Link href={`/product/${product.id}`}>{product.name}</Link>
                                 </h3>
-                                <div className="flex items-center justify-between mt-2">
-                                    <div className="flex flex-col">
-                                        <span className="text-gray-400 text-[10px] uppercase font-bold tracking-tighter">Starting from</span>
-                                        <span className="text-lg font-black text-primary font-inter">৳{product.priceRange}</span>
+                                <div className="flex items-center justify-between mt-2 gap-2">
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="text-gray-400 text-[10px] uppercase font-bold tracking-tighter truncate">Starting from</span>
+                                        <span className="text-sm sm:text-xl font-black text-primary font-inter truncate">৳{product.priceRange}</span>
                                     </div>
                                     <button
-                                        onClick={() => handleAddToCart(product)}
-                                        className="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-primary-dark transition-all flex items-center gap-1.5 shadow-md"
+                                        onClick={() => handleBuyNow(product)}
+                                        className="shrink-0 bg-primary text-white text-[10px] sm:text-xs font-bold px-4 sm:px-5 py-2.5 rounded-xl hover:bg-primary-dark transition-all flex items-center gap-1.5 shadow-md"
                                     >
                                         <Zap size={14} className="fill-current" />
                                         Buy Now

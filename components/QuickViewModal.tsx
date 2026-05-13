@@ -63,6 +63,7 @@ const QuickViewModal = ({ product, onClose }: QuickViewModalProps) => {
                                     src={product.image}
                                     alt={product.name}
                                     fill
+                                    sizes="(max-width: 768px) 100vw, 50vw"
                                     className="object-cover"
                                 />
                                 {product.isNew && (

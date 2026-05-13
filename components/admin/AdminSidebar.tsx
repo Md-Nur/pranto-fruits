@@ -16,6 +16,8 @@ import {
     Store,
     Tags,
     Star,
+    Video,
+    Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,9 +26,11 @@ const navItems = [
     { href: "/admin/products", label: "Products", icon: Package },
     { href: "/admin/categories", label: "Categories", icon: Tags },
     { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+    { href: "/admin/inquiries", label: "Inquiries", icon: Mail },
     { href: "/admin/reviews", label: "Reviews", icon: Star },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/blog", label: "Blog Posts", icon: FileText },
+    { href: "/admin/stories", label: "Garden Stories", icon: Video },
     { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

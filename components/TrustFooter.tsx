@@ -1,11 +1,11 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, MessageCircle, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
 
 const TrustFooter = () => {
     return (
-        <footer className="bg-surface text-gray-700 pt-16 pb-8 border-t border-gray-200">
+        <footer className="bg-surface text-gray-700 pt-16 pb-24 md:pb-8 border-t border-gray-200">
             <div className="container mx-auto px-4 md:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16">
                     {/* Brand Info */}
@@ -28,13 +28,13 @@ const TrustFooter = () => {
                             Village Organic Fruits is an agri-tech initiative in Bangladesh. We are dedicated to providing the purest and healthiest fruits directly from gardens.
                         </p>
                         <div className="flex gap-4">
-                            <a href="https://facebook.com" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
+                            <a href="https://facebook.com/villageorganicfruits" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
                                 <Facebook size={18} />
                             </a>
-                            <a href="https://instagram.com" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
-                                <Instagram size={18} />
+                            <a href="https://wa.me/8801878716088" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all">
+                                <MessageCircle size={18} />
                             </a>
-                            <a href="https://youtube.com" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
+                            <a href="https://youtube.com/@villageorganicfruits" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
                                 <Youtube size={18} />
                             </a>
                         </div>
@@ -94,8 +94,8 @@ const TrustFooter = () => {
                 </div>
 
                 {/* Payment Methods */}
-                <div className="py-8 border-t border-gray-200 flex flex-wrap justify-center gap-4 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
-                    <img src="https://premiumfruitbd.com/public/assets/images/payment-methods.png" alt="Payment Methods" className="h-10 object-contain" />
+                <div className="py-8 border-t border-gray-200 flex flex-wrap justify-center gap-4 opacity-70 grayscale hover:grayscale-0 transition-all duration-500 relative h-20">
+                    <Image src="https://premiumfruitbd.com/public/assets/images/payment-methods.png" alt="Payment Methods" fill sizes="(max-width: 768px) 100vw, 400px" className="object-contain" />
                 </div>
 
                 <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">

@@ -31,7 +31,7 @@ export default function ShopClient({ query, category }: { query?: string; catego
     }, [query, category]);
 
     return (
-        <div className="container mx-auto px-4 md:px-6 py-12">
+        <div className="container mx-auto px-4 md:px-6 pt-28 pb-12">
             <div className="mb-12">
                 <h1 className="text-4xl font-bold text-gray-900 mb-4 capitalize">
                     {query 

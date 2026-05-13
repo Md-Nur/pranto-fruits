@@ -34,22 +34,22 @@ export default async function Home() {
                 {/* Hero Content */}
                 <div className="w-full px-4 md:px-12 lg:px-20 relative z-10 text-center">
                     <div className="max-w-4xl mx-auto">
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                        <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
                             Village Organic Fruits Ltd.
                         </h1>
-                        <p className="text-xl md:text-2xl text-white/90 mb-10 leading-relaxed font-medium">
+                        <p className="text-base sm:text-xl md:text-2xl text-white/90 mb-10 leading-relaxed font-medium">
                             A fruit-only agri initiative delivering safer fruits directly from gardens to your doorstep.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link
                                 href="/gardens"
-                                className="w-full sm:w-auto px-10 py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark transition-all shadow-xl text-lg flex items-center justify-center gap-2"
+                                className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark transition-all shadow-xl text-sm sm:text-lg flex items-center justify-center gap-2"
                             >
                                 Our Contracted Gardens
                             </Link>
                             <Link
                                 href="/shop"
-                                className="w-full sm:w-auto px-10 py-4 bg-white/20 backdrop-blur-md text-white border border-white/40 font-bold rounded-lg hover:bg-white hover:text-primary transition-all text-lg flex items-center justify-center gap-2"
+                                className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 bg-white/20 backdrop-blur-md text-white border border-white/40 font-bold rounded-lg hover:bg-white hover:text-primary transition-all text-sm sm:text-lg flex items-center justify-center gap-2"
                             >
                                 <Play size={20} className="fill-current" />
                                 Try our fruits

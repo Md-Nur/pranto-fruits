@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Play, Youtube, Instagram, ChevronLeft, ChevronRight, Star, Quote } from "lucide-react";
+import { Play, Youtube, MessageCircle, ChevronLeft, ChevronRight, Star, Quote } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -115,7 +115,7 @@ const CustomerReviews = () => {
                         <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-                                    <Instagram size={24} />
+                                    <MessageCircle size={24} />
                                 </div>
                                 <h3 className="text-2xl font-bold text-gray-800">Customer Moments</h3>
                             </div>

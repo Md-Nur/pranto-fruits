@@ -64,10 +64,7 @@ export default function CheckoutPage() {
     const handlePlaceOrder = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!user) {
-            router.push("/login?redirect=/checkout");
-            return;
-        }
+
 
         setIsLoading(true);
         setError("");
@@ -91,18 +88,20 @@ export default function CheckoutPage() {
             }
 
             // Save address fields to user profile for next time
-            try {
-                await fetch("/api/user/profile", {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        address: shippingInfo.address,
-                        city: shippingInfo.city,
-                        zipCode: shippingInfo.zipCode,
-                    }),
-                });
-            } catch {
-                // Non-critical: ignore profile save errors
+            if (user) {
+                try {
+                    await fetch("/api/user/profile", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            address: shippingInfo.address,
+                            city: shippingInfo.city,
+                            zipCode: shippingInfo.zipCode,
+                        }),
+                    });
+                } catch {
+                    // Non-critical: ignore profile save errors
+                }
             }
 
             // Clear the cart after successful order

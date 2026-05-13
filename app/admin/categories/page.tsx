@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Plus, Search, Edit3, Trash2, Tags, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import FruitLoading from "@/components/FruitLoading";
 
@@ -16,6 +17,7 @@ export default function AdminCategoriesPage() {
     const [slug, setSlug] = useState("");
     const [image, setImage] = useState("");
     const [description, setDescription] = useState("");
+    const [isUploading, setIsUploading] = useState(false);
 
     const fetchCategories = async () => {
         try {
@@ -112,7 +114,7 @@ export default function AdminCategoriesPage() {
                         <div className="flex items-start justify-between mb-4">
                             <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0">
                                 {category.image ? (
-                                    <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
+                                    <Image src={category.image} alt={category.name} fill sizes="64px" className="object-cover" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-300">
                                         <Tags size={24} />
@@ -171,13 +173,56 @@ export default function AdminCategoriesPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1.5">Image URL</label>
-                                <input
-                                    type="text"
-                                    value={image}
-                                    onChange={(e) => setImage(e.target.value)}
-                                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
-                                />
+                                <label className="block text-sm font-bold text-gray-700 mb-1.5">Category Image</label>
+                                {image ? (
+                                    <div className="relative w-24 h-24 rounded-xl border border-gray-200 overflow-hidden group mb-2">
+                                        <Image src={image} alt="Category" fill sizes="96px" className="object-cover" />
+                                        <button
+                                            type="button"
+                                            onClick={() => setImage("")}
+                                            className="absolute top-1 right-1 bg-white/80 hover:bg-red-50 hover:text-red-500 text-gray-500 p-1 rounded-md backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100"
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label className="w-24 h-24 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl hover:bg-gray-100 cursor-pointer transition-colors flex flex-col items-center justify-center gap-1 group">
+                                        {isUploading ? (
+                                            <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent animate-spin rounded-full" />
+                                        ) : (
+                                            <>
+                                                <Plus size={24} className="text-gray-400 group-hover:text-emerald-500 transition-colors" />
+                                                <span className="text-[10px] font-medium text-gray-400 uppercase">Upload</span>
+                                            </>
+                                        )}
+                                        <input 
+                                            type="file" 
+                                            className="hidden" 
+                                            accept="image/*" 
+                                            onChange={async (e) => {
+                                                const file = e.target.files?.[0];
+                                                if (!file) return;
+                                                
+                                                setIsUploading(true);
+                                                const formData = new FormData();
+                                                formData.append("image", file);
+                                                try {
+                                                    const configRes = await fetch("/api/config");
+                                                    const { imgbbKey } = await configRes.json();
+                                                    
+                                                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, { method: "POST", body: formData });
+                                                    const data = await res.json();
+                                                    if (data.data?.url) setImage(data.data.url);
+                                                } catch (err) {
+                                                    console.error("Direct upload failed", err);
+                                                } finally {
+                                                    setIsUploading(false);
+                                                }
+                                            }} 
+                                            disabled={isUploading} 
+                                        />
+                                    </label>
+                                )}
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1.5">Description</label>

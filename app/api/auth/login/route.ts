@@ -4,13 +4,28 @@ import bcrypt from "bcryptjs";
 import { signJwt } from "@/lib/jwt-utils";
 import { cookies } from "next/headers";
 
+import { loginSchema } from "@/lib/validation";
+import { rateLimit } from "@/lib/rate-limit";
+
 export async function POST(req: Request) {
     try {
-        const { phone, password } = await req.json();
-
-        if (!phone || !password) {
-            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        // Rate limiting: 10 requests per 15 minutes per IP
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        const rl = rateLimit(ip, 10, 15 * 60 * 1000);
+        if (!rl.success) {
+            return NextResponse.json({ error: "Too many login attempts. Please try again later." }, { status: 429 });
         }
+
+        const body = await req.json();
+        const validation = loginSchema.safeParse(body);
+
+        if (!validation.success) {
+            return NextResponse.json({ 
+                error: validation.error.issues[0].message 
+            }, { status: 400 });
+        }
+
+        const { phone, password } = validation.data;
 
         const user = await prisma.user.findUnique({
             where: { phone },

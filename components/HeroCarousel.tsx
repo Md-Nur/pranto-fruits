@@ -69,6 +69,7 @@ const HeroCarousel = () => {
                                             src={slide.image}
                                             alt={slide.title}
                                             fill
+                                            sizes="(max-width: 768px) 100vw, 50vw"
                                             className="object-contain"
                                             priority={index === 0}
                                         />

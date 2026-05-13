@@ -13,6 +13,7 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
     "/admin/orders": { title: "Orders", subtitle: "Track and manage orders" },
     "/admin/users": { title: "Users", subtitle: "Manage customers & admins" },
     "/admin/blog": { title: "Blog Posts", subtitle: "Manage content & articles" },
+    "/admin/stories": { title: "Garden Stories", icon: "Video", subtitle: "Manage YouTube shorts stories" },
     "/admin/settings": { title: "Settings", subtitle: "Site configuration" },
 };
 

@@ -58,6 +58,7 @@ const CategoryBar = () => {
                                         src={category.image}
                                         alt={category.name}
                                         fill
+                                        sizes="(max-width: 768px) 64px, 80px"
                                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
                                 </div>

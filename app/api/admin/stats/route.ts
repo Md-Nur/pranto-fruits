@@ -15,7 +15,7 @@ export async function GET() {
             prisma.user.count(),
             prisma.order.aggregate({
                 _sum: { totalAmount: true },
-                where: { status: { not: "CANCELLED" } },
+                where: { status: "DELIVERED" },
             }),
             prisma.order.groupBy({
                 by: ["status"],
