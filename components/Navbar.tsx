@@ -31,14 +31,24 @@ const Navbar = () => {
         const checkAuth = async () => {
             try {
                 const res = await fetch("/api/auth/check");
-                const data = await res.json();
-                if (data.authenticated) {
-                    setUser(data.user);
+                if (!res.ok) {
+                    setUser(null);
+                    return;
+                }
+                
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const data = await res.json();
+                    if (data.authenticated) {
+                        setUser(data.user);
+                    } else {
+                        setUser(null);
+                    }
                 } else {
                     setUser(null);
                 }
             } catch (err) {
-                console.error("Auth check failed", err);
+                console.error("Auth check failed:", err);
                 setUser(null);
             }
         };

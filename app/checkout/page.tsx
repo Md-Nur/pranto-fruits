@@ -17,10 +17,49 @@ export default function CheckoutPage() {
     const [user, setUser] = useState<any>(null);
     const [error, setError] = useState("");
 
-    const shippingCost = 60; // Standard shipping inside Dhaka
-    const total = cartTotal + (cartTotal > 0 ? shippingCost : 0);
+    // Helper to extract weight in kg from variant label
+    const parseWeight = (label: string): number => {
+        const match = label.toLowerCase().match(/(\d+(\.\d+)?)\s*(kg|g|gm)/);
+        if (!match) return 0;
+        let value = parseFloat(match[1]);
+        const unit = match[3];
+        if (unit === 'g' || unit === 'gm') {
+            value = value / 1000;
+        }
+        return value;
+    };
+
+    const totalWeight = cart.reduce((total, item) => {
+        const itemWeight = parseWeight(item.variant || "");
+        return total + (itemWeight * item.quantity);
+    }, 0);
+
+    const calculateShipping = () => {
+        if (cart.length === 0) return 0;
+        
+        const isDhaka = shippingInfo.city === "dhaka";
+        const isHome = shippingInfo.deliveryType === "home";
+        
+        let baseCharge = 0;
+        if (isDhaka) {
+            baseCharge = isHome ? 170 : 120;
+        } else {
+            baseCharge = isHome ? 220 : 160;
+        }
+        
+        // Double when it's 20kg (assumes charge is per 10kg block)
+        const weightFactor = Math.max(1, Math.ceil(totalWeight / 10));
+        return baseCharge * weightFactor;
+    };
+
+    const shippingCost = calculateShipping();
+    const total = cartTotal + shippingCost;
 
     const [paymentMethod, setPaymentMethod] = useState("cod");
+    const [paymentDetails, setPaymentDetails] = useState({
+        senderNumber: "",
+        transactionId: "",
+    });
     const [shippingInfo, setShippingInfo] = useState({
         firstName: "",
         lastName: "",
@@ -28,6 +67,7 @@ export default function CheckoutPage() {
         address: "",
         city: "dhaka",
         zipCode: "",
+        deliveryType: "home",
     });
 
     useEffect(() => {
@@ -76,6 +116,7 @@ export default function CheckoutPage() {
                 body: JSON.stringify({
                     totalAmount: total,
                     paymentMethod,
+                    paymentDetails: (paymentMethod === 'bkash' || paymentMethod === 'nagad') ? paymentDetails : null,
                     shippingInfo,
                     orderItems: cart,
                 }),
@@ -243,6 +284,36 @@ export default function CheckoutPage() {
                                     </div>
                                 </div>
 
+                                <div className="space-y-3">
+                                    <label className="text-sm font-medium text-gray-700">Delivery Method</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <label className={`cursor-pointer flex items-center justify-between p-4 rounded-xl border-2 transition-all ${shippingInfo.deliveryType === 'home' ? 'border-primary bg-primary/5' : 'border-gray-100 hover:border-gray-200'}`}>
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shippingInfo.deliveryType === 'home' ? 'border-primary' : 'border-gray-300'}`}>
+                                                    {shippingInfo.deliveryType === 'home' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-sm">Home Delivery</p>
+                                                    <p className="text-xs text-gray-500">To your doorstep</p>
+                                                </div>
+                                            </div>
+                                            <input type="radio" name="deliveryType" value="home" checked={shippingInfo.deliveryType === 'home'} onChange={handleInputChange} className="hidden" />
+                                        </label>
+                                        <label className={`cursor-pointer flex items-center justify-between p-4 rounded-xl border-2 transition-all ${shippingInfo.deliveryType === 'point' ? 'border-primary bg-primary/5' : 'border-gray-100 hover:border-gray-200'}`}>
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shippingInfo.deliveryType === 'point' ? 'border-primary' : 'border-gray-300'}`}>
+                                                    {shippingInfo.deliveryType === 'point' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-sm">Point Delivery</p>
+                                                    <p className="text-xs text-gray-500">Pickup from point</p>
+                                                </div>
+                                            </div>
+                                            <input type="radio" name="deliveryType" value="point" checked={shippingInfo.deliveryType === 'point'} onChange={handleInputChange} className="hidden" />
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <div className="pt-6">
                                     <button type="submit" className="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-primary-dark transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
                                         Continue to Payment <ChevronRight size={20} />
@@ -286,12 +357,64 @@ export default function CheckoutPage() {
                                                 <span className="font-bold text-[#e2136e] text-xs">bKash</span>
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-bold text-gray-900">bKash Online</h4>
+                                                <h4 className="font-bold text-gray-900 font-hind-siliguri">বিকাশ (সেন্ড মানি)</h4>
                                                 <p className="text-sm text-gray-500">Fast and secure mobile payment</p>
                                             </div>
                                         </div>
                                         <input type="radio" className="hidden" name="payment" value="bkash" checked={paymentMethod === 'bkash'} onChange={() => setPaymentMethod('bkash')} />
                                     </label>
+
+                                    <label className={`block cursor-pointer rounded-2xl border-2 p-4 transition-all ${paymentMethod === 'nagad' ? 'border-[#f37021] bg-[#f37021]/5' : 'border-gray-200 hover:border-[#f37021]/50'}`}>
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center border-gray-300">
+                                                {paymentMethod === 'nagad' && <div className="w-3 h-3 rounded-full bg-[#f37021]" />}
+                                            </div>
+                                            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
+                                                <span className="font-bold text-[#f37021] text-xs">Nagad</span>
+                                            </div>
+                                            <div className="flex-1">
+                                                <h4 className="font-bold text-gray-900 font-hind-siliguri">নগদ (সেন্ড মানি)</h4>
+                                                <p className="text-sm text-gray-500">Safe and easy mobile wallet</p>
+                                            </div>
+                                        </div>
+                                        <input type="radio" className="hidden" name="payment" value="nagad" checked={paymentMethod === 'nagad'} onChange={() => setPaymentMethod('nagad')} />
+                                    </label>
+
+                                    {(paymentMethod === 'bkash' || paymentMethod === 'nagad') && (
+                                        <div className="p-5 bg-gray-50 rounded-2xl border border-dashed border-gray-300 space-y-4 animate-in fade-in slide-in-from-top-2">
+                                            <div className="flex items-center gap-3 text-sm text-gray-600 bg-white p-3 rounded-xl border border-gray-100">
+                                                <div className="w-8 h-8 bg-primary/10 text-primary rounded-full flex items-center justify-center shrink-0">
+                                                    <Truck size={16} />
+                                                </div>
+                                                <p className="font-hind-siliguri">নিচের নাম্বারে <strong>৳{total}</strong> সেন্ড মানি করুন: <br /><span className="text-lg font-bold text-gray-900">01878716088</span></p>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Sender Number</label>
+                                                    <input 
+                                                       type="text" 
+                                                       placeholder="017XXXXXXXX" 
+                                                       required
+                                                       value={paymentDetails.senderNumber}
+                                                       onChange={(e) => setPaymentDetails({...paymentDetails, senderNumber: e.target.value})}
+                                                       className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Transaction ID</label>
+                                                    <input 
+                                                       type="text" 
+                                                       placeholder="TRX12345678" 
+                                                       required
+                                                       value={paymentDetails.transactionId}
+                                                       onChange={(e) => setPaymentDetails({...paymentDetails, transactionId: e.target.value})}
+                                                       className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <label className={`block cursor-pointer rounded-2xl border-2 p-4 transition-all ${paymentMethod === 'card' ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
                                         <div className="flex items-center gap-4">
@@ -357,7 +480,7 @@ export default function CheckoutPage() {
                                 <span>৳{cartTotal}</span>
                             </div>
                             <div className="flex justify-between text-gray-500">
-                                <span>Shipping</span>
+                                <span>Shipping ({totalWeight}kg)</span>
                                 <span>৳{shippingCost}</span>
                             </div>
                             <div className="flex justify-between text-gray-500 border-t border-dashed pt-2 mt-2 font-bold text-gray-900">

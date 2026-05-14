@@ -8,6 +8,7 @@ import OrderDetailModal from "@/components/admin/OrderDetailModal";
 
 const statusConfig: Record<string, { label: string; color: string; bg: string; icon: any }> = {
     PENDING: { label: "Pending", color: "text-amber-600", bg: "bg-amber-50 border-amber-200", icon: Clock },
+    PAID: { label: "Paid", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200", icon: CheckCircle2 },
     PROCESSING: { label: "Processing", color: "text-blue-600", bg: "bg-blue-50 border-blue-200", icon: TrendingUp },
     SHIPPED: { label: "Shipped", color: "text-purple-600", bg: "bg-purple-50 border-purple-200", icon: Truck },
     DELIVERED: { label: "Delivered", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200", icon: CheckCircle2 },
@@ -17,6 +18,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string; i
 const statusTabs = [
     { key: "", label: "All" },
     { key: "PENDING", label: "Pending" },
+    { key: "PAID", label: "Paid" },
     { key: "PROCESSING", label: "Processing" },
     { key: "SHIPPED", label: "Shipped" },
     { key: "DELIVERED", label: "Delivered" },

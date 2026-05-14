@@ -17,13 +17,14 @@ export async function POST(req: Request) {
             }
         }
 
-        const { totalAmount, paymentMethod, shippingInfo, orderItems } = await req.json();
+        const { totalAmount, paymentMethod, paymentDetails, shippingInfo, orderItems } = await req.json();
 
         const order = await prisma.order.create({
             data: {
                 ...(userId ? { userId } : {}),
                 totalAmount,
                 paymentMethod,
+                paymentDetails,
                 shippingInfo,
                 orderItems,
             },

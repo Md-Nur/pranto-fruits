@@ -7,13 +7,14 @@ import { cn } from "@/lib/utils";
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
     PENDING: { label: "Pending", color: "text-amber-600", bg: "bg-amber-50 border-amber-200" },
+    PAID: { label: "Paid", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" },
     PROCESSING: { label: "Processing", color: "text-blue-600", bg: "bg-blue-50 border-blue-200" },
     SHIPPED: { label: "Shipped", color: "text-purple-600", bg: "bg-purple-50 border-purple-200" },
     DELIVERED: { label: "Delivered", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" },
     CANCELLED: { label: "Cancelled", color: "text-red-600", bg: "bg-red-50 border-red-200" },
 };
 
-const allStatuses = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+const allStatuses = ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
 
 interface OrderDetailModalProps {
     isOpen: boolean;
@@ -135,11 +136,26 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusUpdate }: OrderDetai
 
                     {/* Payment + Total */}
                     <div className="border-t border-gray-100 pt-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
-                                <CreditCard size={14} />
-                                <span>Payment: <strong className="text-gray-700 uppercase">{order.paymentMethod}</strong></span>
+                        <div className="flex flex-col gap-2 mb-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                    <CreditCard size={14} />
+                                    <span>Payment: <strong className="text-gray-700 uppercase">{order.paymentMethod}</strong></span>
+                                </div>
                             </div>
+                            {order.paymentDetails && (
+                                <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-xs space-y-1">
+                                    <p className="text-emerald-800 font-bold uppercase tracking-wider text-[10px]">Transaction Details</p>
+                                    <div className="flex justify-between">
+                                        <span className="text-emerald-600/70">Sender Number:</span>
+                                        <span className="font-bold text-emerald-700">{(order.paymentDetails as any).senderNumber}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-emerald-600/70">Transaction ID:</span>
+                                        <span className="font-bold text-emerald-700">{(order.paymentDetails as any).transactionId}</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         <div className="flex items-center justify-between text-lg">
                             <span className="font-medium text-gray-700">Total</span>

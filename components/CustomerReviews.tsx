@@ -29,10 +29,23 @@ const CustomerReviews = () => {
         const fetchReviews = async () => {
             try {
                 const res = await fetch("/api/reviews");
-                const data = await res.json();
-                setReviews(data);
+                if (!res.ok) {
+                    console.warn(`Reviews API returned status: ${res.status}`);
+                    setReviews([]);
+                    return;
+                }
+                
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const data = await res.json();
+                    setReviews(Array.isArray(data) ? data : []);
+                } else {
+                    console.warn("Reviews API did not return JSON");
+                    setReviews([]);
+                }
             } catch (err) {
-                console.error("Failed to fetch reviews", err);
+                console.error("Failed to fetch reviews:", err);
+                setReviews([]);
             } finally {
                 setIsLoading(false);
             }

@@ -14,10 +14,23 @@ const CategoryBar = () => {
         const fetchCategories = async () => {
             try {
                 const res = await fetch("/api/categories");
-                const data = await res.json();
-                setCategories(data);
+                if (!res.ok) {
+                    console.warn(`Categories API returned status: ${res.status}`);
+                    setCategories([]);
+                    return;
+                }
+                
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const data = await res.json();
+                    setCategories(Array.isArray(data) ? data : []);
+                } else {
+                    console.warn("Categories API did not return JSON");
+                    setCategories([]);
+                }
             } catch (err) {
-                console.error("Failed to fetch categories", err);
+                console.error("Failed to fetch categories:", err);
+                setCategories([]);
             } finally {
                 setIsLoading(false);
             }

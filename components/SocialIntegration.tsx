@@ -33,12 +33,27 @@ const SocialIntegration = () => {
     const fetchStories = async () => {
         try {
             const res = await fetch("/api/stories");
-            const data = await res.json();
-            if (Array.isArray(data)) {
-                setStories(data);
+            if (!res.ok) {
+                console.warn(`Stories API returned status: ${res.status}`);
+                setStories([]);
+                return;
+            }
+            
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    setStories(data);
+                } else {
+                    setStories([]);
+                }
+            } else {
+                console.warn("Stories API did not return JSON");
+                setStories([]);
             }
         } catch (err) {
-            console.error("Failed to fetch stories", err);
+            console.error("Failed to fetch stories:", err);
+            setStories([]);
         }
     };
 
@@ -216,7 +231,7 @@ const SocialIntegration = () => {
                 )}
             </AnimatePresence>
             {/* YouTube Stories Section */}
-            {mounted && pathname === "/" && (
+            {mounted && pathname === "/" && stories.length > 0 && (
                 <section className="py-24 bg-white relative overflow-hidden">
                     {/* Decorative background elements */}
                     <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />

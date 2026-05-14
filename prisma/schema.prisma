@@ -89,6 +89,7 @@ model User {
 
 enum OrderStatus {
   PENDING
+  PAID
   PROCESSING
   SHIPPED
   DELIVERED
@@ -101,6 +102,7 @@ model Order {
   user          User?       @relation(fields: [userId], references: [id])
   totalAmount   Float
   paymentMethod String      @default("cod") // cod, bkash, card
+  paymentDetails Json?      // For mobile banking: { senderNumber, transactionId }
   status        OrderStatus @default(PENDING)
   shippingInfo  Json // Contains address, phone, etc.
   orderItems    Json // Contains cart items array
