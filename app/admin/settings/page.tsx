@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
     Store,
     Phone,
@@ -11,7 +11,10 @@ import {
     MessageCircle,
     ExternalLink,
     Shield,
+    KeyRound,
+    Loader2
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const contactInfo = [
     { icon: Phone, label: "Phone", value: "01878716088 & 01576974735" },
@@ -27,6 +30,52 @@ const socialLinks = [
 ];
 
 export default function AdminSettingsPage() {
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (newPassword !== confirmPassword) {
+            toast.error("New passwords do not match");
+            return;
+        }
+        
+        if (newPassword.length < 6) {
+            toast.error("New password must be at least 6 characters long");
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const res = await fetch("/api/admin/change-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ currentPassword, newPassword }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.error(data.error || "Failed to change password");
+            } else {
+                toast.success("Password changed successfully");
+                setCurrentPassword("");
+                setNewPassword("");
+                setConfirmPassword("");
+            }
+        } catch (error) {
+            console.error("Change password error:", error);
+            toast.error("An unexpected error occurred");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <div className="space-y-6 max-w-4xl">
             {/* Site Information */}
@@ -141,6 +190,62 @@ export default function AdminSettingsPage() {
                         <p className="text-sm font-bold text-gray-900">JWT (HttpOnly Cookie)</p>
                     </div>
                 </div>
+            </div>
+            {/* Account Security */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                        <KeyRound size={20} className="text-red-600" />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-gray-900">Account Security</h3>
+                        <p className="text-xs text-gray-400">Change your admin password</p>
+                    </div>
+                </div>
+
+                <form onSubmit={handlePasswordChange} className="space-y-4 max-w-md">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                        <input
+                            type="password"
+                            required
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all text-sm"
+                            placeholder="Enter current password"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                        <input
+                            type="password"
+                            required
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all text-sm"
+                            placeholder="Enter new password"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                        <input
+                            type="password"
+                            required
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all text-sm"
+                            placeholder="Confirm new password"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex items-center justify-center gap-2 w-full bg-red-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-red-700 transition-colors disabled:bg-red-400"
+                    >
+                        {isSubmitting && <Loader2 size={18} className="animate-spin" />}
+                        {isSubmitting ? "Updating..." : "Change Password"}
+                    </button>
+                </form>
             </div>
         </div>
     );
