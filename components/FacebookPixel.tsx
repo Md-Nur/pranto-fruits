@@ -66,43 +66,93 @@ export default function FacebookPixel() {
 // Helper functions to track standard Facebook Pixel events
 // Import and call these from anywhere in the app
 
-export function trackFBEvent(eventName: string, params?: Record<string, unknown>) {
+export interface FBUserData {
+  em?: string; // Email
+  ph?: string; // Phone number
+  fn?: string; // First name
+  ln?: string; // Last name
+  external_id?: string; // e.g., db_user_id
+}
+
+export function trackFBEvent(
+  eventName: string,
+  params?: Record<string, unknown>,
+  userData?: FBUserData
+) {
+  // 1. Generate unique event ID for deduplication
+  const event_id = typeof crypto !== 'undefined' && crypto.randomUUID 
+    ? crypto.randomUUID() 
+    : `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+  const eventTime = Math.floor(Date.now() / 1000);
+  const eventSourceUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+  // 2. Track via Browser Pixel (with eventID)
   if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
-    window.fbq('track', eventName, params);
+    window.fbq('track', eventName, params, { eventID: event_id });
+  }
+
+  // 3. Track via Conversions API (Server-side)
+  if (typeof window !== 'undefined') {
+    fetch('/api/fb-capi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event_name: eventName,
+        event_time: eventTime,
+        event_id: event_id,
+        event_source_url: eventSourceUrl,
+        custom_data: params,
+        user_data: userData,
+      }),
+    }).catch((err) => {
+      console.error('Failed to send CAPI event:', err);
+    });
   }
 }
 
 // Pre-built event trackers for common e-commerce actions
 export const fbEvents = {
   /** Track when a user views a product */
-  viewContent: (params: { content_name: string; content_ids: string[]; content_type?: string; value?: number; currency?: string }) =>
-    trackFBEvent('ViewContent', { content_type: 'product', currency: 'BDT', ...params }),
+  viewContent: (
+    params: { content_name: string; content_ids: string[]; content_type?: string; value?: number; currency?: string },
+    userData?: FBUserData
+  ) => trackFBEvent('ViewContent', { content_type: 'product', currency: 'BDT', ...params }, userData),
 
   /** Track when a user adds a product to cart */
-  addToCart: (params: { content_name: string; content_ids: string[]; value: number; currency?: string }) =>
-    trackFBEvent('AddToCart', { content_type: 'product', currency: 'BDT', ...params }),
+  addToCart: (
+    params: { content_name: string; content_ids: string[]; value: number; currency?: string },
+    userData?: FBUserData
+  ) => trackFBEvent('AddToCart', { content_type: 'product', currency: 'BDT', ...params }, userData),
 
   /** Track when a user initiates checkout */
-  initiateCheckout: (params: { value: number; currency?: string; num_items?: number }) =>
-    trackFBEvent('InitiateCheckout', { currency: 'BDT', ...params }),
+  initiateCheckout: (
+    params: { value: number; currency?: string; num_items?: number },
+    userData?: FBUserData
+  ) => trackFBEvent('InitiateCheckout', { currency: 'BDT', ...params }, userData),
 
   /** Track when a user completes a purchase */
-  purchase: (params: { value: number; currency?: string; content_ids?: string[]; num_items?: number }) =>
-    trackFBEvent('Purchase', { currency: 'BDT', ...params }),
+  purchase: (
+    params: { value: number; currency?: string; content_ids?: string[]; num_items?: number },
+    userData?: FBUserData
+  ) => trackFBEvent('Purchase', { currency: 'BDT', ...params }, userData),
 
   /** Track when a user adds to wishlist */
-  addToWishlist: (params: { content_name: string; content_ids: string[]; value?: number; currency?: string }) =>
-    trackFBEvent('AddToWishlist', { content_type: 'product', currency: 'BDT', ...params }),
+  addToWishlist: (
+    params: { content_name: string; content_ids: string[]; value?: number; currency?: string },
+    userData?: FBUserData
+  ) => trackFBEvent('AddToWishlist', { content_type: 'product', currency: 'BDT', ...params }, userData),
 
   /** Track when a user searches */
-  search: (searchString: string) =>
-    trackFBEvent('Search', { search_string: searchString }),
+  search: (searchString: string, userData?: FBUserData) =>
+    trackFBEvent('Search', { search_string: searchString }, userData),
 
   /** Track when a user contacts the business */
-  contact: () =>
-    trackFBEvent('Contact'),
+  contact: (userData?: FBUserData) => trackFBEvent('Contact', undefined, userData),
 
   /** Track a lead/inquiry */
-  lead: (params?: { content_name?: string; value?: number; currency?: string }) =>
-    trackFBEvent('Lead', { currency: 'BDT', ...params }),
+  lead: (
+    params?: { content_name?: string; value?: number; currency?: string },
+    userData?: FBUserData
+  ) => trackFBEvent('Lead', { currency: 'BDT', ...params }, userData),
 };
