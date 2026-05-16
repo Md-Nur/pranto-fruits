@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { cookies } from "next/headers";
+import { verifyJwt } from "@/lib/jwt-utils";
 
 export async function GET(request: NextRequest) {
     try {
@@ -11,8 +13,8 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
         }
 
-        // Accept formats: PF-000042, PF000042, 42
-        const numericId = parseInt(rawId.replace(/^PF-?/i, ""), 10);
+        // Accept formats: #ORD-1750, ORD1750, #1750, 1750, PF-000042
+        const numericId = parseInt(rawId.replace(/^(#?ORD-?|PF-?|#)/i, ""), 10);
 
         if (isNaN(numericId) || numericId <= 0) {
             return NextResponse.json({ error: "Invalid order ID format" }, { status: 400 });
@@ -22,7 +24,7 @@ export async function GET(request: NextRequest) {
             where: { id: numericId },
             include: {
                 user: {
-                    select: { name: true, phone: true },
+                    select: { id: true, name: true, phone: true },
                 },
             },
         });
@@ -31,13 +33,36 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: "Order not found" }, { status: 404 });
         }
 
-        // If a phone number is provided, verify it matches the order's shipping info or user
-        if (phone) {
+        // --- SECURITY CHECK ---
+        // Check if the current user is the owner
+        const cookieStore = await cookies();
+        const token = cookieStore.get("auth-token")?.value;
+        let isOwner = false;
+
+        if (token) {
+            try {
+                const payload = await verifyJwt(token);
+                if (payload && payload.id === order.userId) {
+                    isOwner = true;
+                }
+            } catch (err) {
+                // Invalid token, treat as guest
+            }
+        }
+
+        // If not owner, mandatory phone verification
+        if (!isOwner) {
+            if (!phone) {
+                // Return 403 to trigger phone input on frontend
+                return NextResponse.json({ error: "Verification required" }, { status: 403 });
+            }
+
             const shipping = order.shippingInfo as any;
             const orderPhone = (shipping?.phone || "").replace(/\D/g, "");
             const userPhone = (order.user?.phone || "").replace(/\D/g, "");
             const inputPhone = phone.replace(/\D/g, "");
 
+            // Allow matching either the shipping phone or the user account phone
             if (orderPhone !== inputPhone && userPhone !== inputPhone) {
                 return NextResponse.json({ error: "Phone number does not match this order" }, { status: 403 });
             }

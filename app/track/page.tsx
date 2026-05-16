@@ -39,7 +39,7 @@ function removeRecentOrderId(id: number) {
 /* ── helpers ──────────────────────────────────────────────── */
 
 function formatOrderId(id: number) {
-    return `PF-${id.toString().padStart(6, "0")}`;
+    return `#ORD-${id}`;
 }
 
 function formatDate(dateStr: string) {
@@ -290,7 +290,7 @@ const TrackOrder = () => {
                                 <input
                                     id="order-id-input"
                                     type="text"
-                                    placeholder="e.g. PF-000042"
+                                    placeholder="e.g. #ORD-1750"
                                     value={orderId}
                                     onChange={(e) => { setOrderId(e.target.value); setError(null); }}
                                     className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all font-semibold text-base placeholder:font-normal placeholder:text-gray-400"
