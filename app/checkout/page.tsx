@@ -5,17 +5,33 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { ArrowLeft, CheckCircle2, ChevronRight, CreditCard, Truck, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ChevronRight, Truck, Loader2, AlertCircle, Minus, Plus, Trash2 } from "lucide-react";
 import FruitLoading from "@/components/FruitLoading";
 
 export default function CheckoutPage() {
-    const { cart, cartTotal, clearCart } = useCart();
+    const { cart, cartTotal, clearCart, updateQuantity, removeFromCart } = useCart();
     const router = useRouter();
     const [step, setStep] = useState(1); // 1: Shipping, 2: Payment, 3: Success
     const [isLoading, setIsLoading] = useState(false);
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [user, setUser] = useState<any>(null);
     const [error, setError] = useState("");
+    const [placedOrderId, setPlacedOrderId] = useState<number | null>(null);
+
+    const [paymentMethod, setPaymentMethod] = useState("cod");
+    const [paymentDetails, setPaymentDetails] = useState({
+        senderNumber: "",
+        transactionId: "",
+    });
+    const [shippingInfo, setShippingInfo] = useState({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        address: "",
+        city: "dhaka",
+        zipCode: "",
+        deliveryType: "home",
+    });
 
     // Helper to extract weight in kg from variant label
     const parseWeight = (label: string): number => {
@@ -54,21 +70,6 @@ export default function CheckoutPage() {
 
     const shippingCost = calculateShipping();
     const total = cartTotal + shippingCost;
-
-    const [paymentMethod, setPaymentMethod] = useState("cod");
-    const [paymentDetails, setPaymentDetails] = useState({
-        senderNumber: "",
-        transactionId: "",
-    });
-    const [shippingInfo, setShippingInfo] = useState({
-        firstName: "",
-        lastName: "",
-        phone: "",
-        address: "",
-        city: "dhaka",
-        zipCode: "",
-        deliveryType: "home",
-    });
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -147,6 +148,7 @@ export default function CheckoutPage() {
 
             // Clear the cart after successful order
             clearCart();
+            setPlacedOrderId(data.orderId);
             setStep(3);
         } catch (err: any) {
             setError(err.message);
@@ -191,7 +193,7 @@ export default function CheckoutPage() {
                 </p>
                 <div className="bg-gray-50 rounded-2xl p-6 w-full max-w-sm mb-8 text-center">
                     <p className="text-sm text-gray-500 mb-1">Order Number</p>
-                    <p className="text-xl font-bold text-gray-900">#ORD-{Math.floor(1000 + Math.random() * 9000)}</p>
+                    <p className="text-xl font-bold text-gray-900">#ORD-{placedOrderId || "..."}</p>
                 </div>
                 <Link
                     href="/"
@@ -416,21 +418,6 @@ export default function CheckoutPage() {
                                         </div>
                                     )}
 
-                                    <label className={`block cursor-pointer rounded-2xl border-2 p-4 transition-all ${paymentMethod === 'card' ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center border-gray-300">
-                                                {paymentMethod === 'card' && <div className="w-3 h-3 rounded-full bg-blue-600" />}
-                                            </div>
-                                            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600">
-                                                <CreditCard size={20} />
-                                            </div>
-                                            <div className="flex-1">
-                                                <h4 className="font-bold text-gray-900">Credit / Debit Card</h4>
-                                                <p className="text-sm text-gray-500">Visa, Mastercard, Amex</p>
-                                            </div>
-                                        </div>
-                                        <input type="radio" className="hidden" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} />
-                                    </label>
                                 </div>
 
                                 <div className="pt-6 flex gap-4">
@@ -463,10 +450,33 @@ export default function CheckoutPage() {
                                         )}
                                     </div>
                                     <div className="flex-1">
-                                        <h4 className="font-bold text-sm text-gray-900 line-clamp-1">{item.name}</h4>
+                                        <div className="flex items-start justify-between">
+                                            <h4 className="font-bold text-sm text-gray-900 line-clamp-1">{item.name}</h4>
+                                            <button 
+                                                onClick={() => removeFromCart(item.id, item.variant)}
+                                                className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                                title="Remove item"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
                                         {item.variant && <p className="text-xs text-gray-500">{item.variant}</p>}
-                                        <div className="flex items-center justify-between mt-1">
-                                            <span className="text-xs text-gray-500">Qty: {item.quantity}</span>
+                                        <div className="flex items-center justify-between mt-2">
+                                            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden h-7">
+                                                <button 
+                                                    onClick={() => updateQuantity(item.id, item.variant, -1)}
+                                                    className="px-2 hover:bg-gray-100 transition-colors text-gray-500"
+                                                >
+                                                    <Minus size={12} />
+                                                </button>
+                                                <span className="px-2 text-xs font-medium min-w-[20px] text-center">{item.quantity}</span>
+                                                <button 
+                                                    onClick={() => updateQuantity(item.id, item.variant, 1)}
+                                                    className="px-2 hover:bg-gray-100 transition-colors text-gray-500"
+                                                >
+                                                    <Plus size={12} />
+                                                </button>
+                                            </div>
                                             <span className="font-bold text-sm text-organic-green">৳{item.price * item.quantity}</span>
                                         </div>
                                     </div>

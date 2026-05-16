@@ -1,0 +1,1 @@
+after oder from checkout the user gets an order id (like #ORD-1750) but when this order id paste in track order page it dosn't find order. on the other hand when user put order id like 3 or 4 then the main order id shows (which is not secure that anyone can track any order). Solve this problem

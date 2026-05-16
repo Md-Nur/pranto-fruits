@@ -8,13 +8,19 @@ let prisma: PrismaClient;
 
 if (process.env.NODE_ENV === 'production') {
     const connectionString = `${process.env.DATABASE_URL}`;
-    const pool = new Pool({ connectionString });
+    const poolConnectionString = connectionString.includes('?') 
+        ? `${connectionString}&uselibpqcompat=true` 
+        : `${connectionString}?uselibpqcompat=true`;
+    const pool = new Pool({ connectionString: poolConnectionString });
     const adapter = new PrismaPg(pool);
     prisma = new PrismaClient({ adapter });
 } else {
     if (!globalForPrisma.prisma) {
         const connectionString = `${process.env.DATABASE_URL}`;
-        const pool = new Pool({ connectionString });
+        const poolConnectionString = connectionString.includes('?') 
+            ? `${connectionString}&uselibpqcompat=true` 
+            : `${connectionString}?uselibpqcompat=true`;
+        const pool = new Pool({ connectionString: poolConnectionString });
         const adapter = new PrismaPg(pool);
         globalForPrisma.prisma = new PrismaClient({ adapter });
     }
