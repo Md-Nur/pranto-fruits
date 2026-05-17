@@ -96,8 +96,13 @@ const TrustFooter = () => {
                 </div>
 
                 {/* Payment Methods */}
-                <div className="py-8 border-t border-gray-200 flex flex-wrap justify-center gap-4 opacity-70 grayscale hover:grayscale-0 transition-all duration-500 relative h-20">
-                    <Image src="/assets/images/payment-methods.png" alt="Payment Methods" fill sizes="(max-width: 768px) 100vw, 400px" className="object-contain" />
+                <div className="py-8 border-t border-gray-200 flex flex-wrap justify-center gap-6 opacity-80 grayscale hover:grayscale-0 transition-all duration-500">
+                    <div className="relative w-24 h-12">
+                        <Image src="/assets/images/bkash.png" alt="bKash" fill className="object-contain" />
+                    </div>
+                    <div className="relative w-24 h-12">
+                        <Image src="/assets/images/nagad.png" alt="Nagad" fill className="object-contain" />
+                    </div>
                 </div>
 
                 <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
