@@ -25,6 +25,8 @@ interface OrderDetailModalProps {
 
 const OrderDetailModal = ({ isOpen, onClose, order, onStatusUpdate }: OrderDetailModalProps) => {
     const [updating, setUpdating] = React.useState(false);
+    const [pushingToSteadfast, setPushingToSteadfast] = React.useState(false);
+    const [steadfastError, setSteadfastError] = React.useState("");
 
     if (!isOpen || !order) return null;
 
@@ -40,6 +42,30 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusUpdate }: OrderDetai
             console.error(err);
         }
         setUpdating(false);
+    };
+
+    const handlePushToSteadfast = async () => {
+        if (!confirm("Are you sure you want to send this order to Steadfast Courier?")) return;
+        setPushingToSteadfast(true);
+        setSteadfastError("");
+        try {
+            const res = await fetch(`/api/admin/orders/${order.id}/steadfast`, {
+                method: "POST",
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                setSteadfastError(data.error || "Failed to push to Steadfast.");
+            } else {
+                // To reflect immediately without full page reload, we ideally should refresh order or update locally.
+                // We can trigger a status update to same status just to refresh, or show an alert.
+                alert(`Successfully pushed to Steadfast! Tracking Code: ${data.trackingCode}`);
+                // Optional: trigger refresh by calling a dummy status update or closing/opening modal
+                await onStatusUpdate(order.id, order.status);
+            }
+        } catch (err: any) {
+            setSteadfastError(err.message || "An error occurred.");
+        }
+        setPushingToSteadfast(false);
     };
 
     const sc = statusConfig[order.status];
@@ -82,6 +108,32 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusUpdate }: OrderDetai
                                 <option key={s} value={s}>{statusConfig[s].label}</option>
                             ))}
                         </select>
+                    </div>
+
+                    {/* Steadfast Courier Integration */}
+                    <div className="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Package size={18} className="text-blue-500" />
+                                <span className="text-sm font-bold text-gray-800">Steadfast Courier</span>
+                            </div>
+                            {shippingInfo?.steadfastTrackingCode ? (
+                                <div className="text-xs text-blue-700 bg-blue-100 px-3 py-1.5 rounded-lg font-semibold flex items-center gap-2">
+                                    Tracking ID: {shippingInfo.steadfastTrackingCode}
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={handlePushToSteadfast}
+                                    disabled={pushingToSteadfast}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                                >
+                                    {pushingToSteadfast ? "Sending..." : "Send to Steadfast"}
+                                </button>
+                            )}
+                        </div>
+                        {steadfastError && (
+                            <p className="mt-2 text-xs text-red-500 font-medium">{steadfastError}</p>
+                        )}
                     </div>
 
                     {/* Customer Info */}

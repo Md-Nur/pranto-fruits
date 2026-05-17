@@ -50,7 +50,7 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
         addToCart({
             id: product.id,
             name: product.name,
-            price: product.basePrice,
+            price: product.variants[0]?.price ?? product.basePrice,
             image: product.image,
             quantity: 1,
             variant: product.variants[0]?.label
@@ -61,7 +61,7 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
         addToCart({
             id: product.id,
             name: product.name,
-            price: product.basePrice,
+            price: product.variants[0]?.price ?? product.basePrice,
             image: product.image,
             quantity: 1,
             variant: product.variants[0]?.label
