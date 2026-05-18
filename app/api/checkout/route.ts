@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyJwt } from "@/lib/jwt-utils";
 import { cookies } from "next/headers";
+import { orderSchema } from "@/lib/validation";
 
 export async function POST(req: Request) {
     try {
@@ -17,14 +18,23 @@ export async function POST(req: Request) {
             }
         }
 
-        const { totalAmount, paymentMethod, paymentDetails, shippingInfo, orderItems } = await req.json();
+        const body = await req.json();
+        const validation = orderSchema.safeParse(body);
+
+        if (!validation.success) {
+            return NextResponse.json({ 
+                error: validation.error.issues[0].message 
+            }, { status: 400 });
+        }
+
+        const { totalAmount, paymentMethod, paymentDetails, shippingInfo, orderItems } = validation.data;
 
         const order = await prisma.order.create({
             data: {
                 ...(userId ? { userId } : {}),
                 totalAmount,
                 paymentMethod,
-                paymentDetails,
+                paymentDetails: paymentDetails || undefined,
                 shippingInfo,
                 orderItems,
             },

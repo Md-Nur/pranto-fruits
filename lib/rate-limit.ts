@@ -12,6 +12,18 @@ interface RateLimitStore {
 
 const store: RateLimitStore = {};
 
+// Clean up expired entries every 10 minutes to prevent memory leaks in long-running processes
+if (typeof setInterval !== "undefined") {
+    setInterval(() => {
+        const now = Date.now();
+        for (const key in store) {
+            if (store[key].resetTime < now) {
+                delete store[key];
+            }
+        }
+    }, 10 * 60 * 1000); // 10 minutes
+}
+
 export function rateLimit(ip: string, limit: number, windowMs: number) {
     const now = Date.now();
     const key = `rl:${ip}`;

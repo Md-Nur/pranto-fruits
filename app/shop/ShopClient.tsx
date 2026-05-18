@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import ProductGrid, { ProductWithVariants } from "@/components/ProductGrid";
-import FruitLoading from "@/components/FruitLoading";
+import { ProductGridSkeleton } from "@/components/ProductSkeleton";
 
 export default function ShopClient({ query, category }: { query?: string; category?: string }) {
     const [products, setProducts] = useState<ProductWithVariants[]>([]);
@@ -45,7 +45,7 @@ export default function ShopClient({ query, category }: { query?: string; catego
                 </p>
             </div>
             {loading ? (
-                <FruitLoading />
+                <ProductGridSkeleton />
             ) : products.length > 0 ? (
                 <ProductGrid products={products} />
             ) : (

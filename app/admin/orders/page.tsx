@@ -58,8 +58,8 @@ export default function AdminOrdersPage() {
         if (!res.ok) throw new Error("Failed to update");
         const data = await res.json();
         // Update local state
-        setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: data.order.status } : o)));
-        setSelectedOrder((prev: any) => prev && prev.id === orderId ? { ...prev, status: data.order.status } : prev);
+        setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: data.order.status, shippingInfo: data.order.shippingInfo } : o)));
+        setSelectedOrder((prev: any) => prev && prev.id === orderId ? { ...prev, status: data.order.status, shippingInfo: data.order.shippingInfo } : prev);
     };
 
     if (loading) return <FruitLoading />;

@@ -6,6 +6,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminHeader from "@/components/admin/AdminHeader";
 import { cn } from "@/lib/utils";
 import FruitLoading from "@/components/FruitLoading";
+import { motion, AnimatePresence } from "framer-motion";
 
 const pageTitles: Record<string, { title: string; subtitle: string; icon?: string }> = {
     "/admin": { title: "Dashboard", subtitle: "Overview & Analytics" },
@@ -99,8 +100,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     subtitle={pageInfo.subtitle}
                     onMobileMenuToggle={() => setMobileOpen(!mobileOpen)}
                 />
-                <main className="p-4 md:p-6 max-w-[1600px] mx-auto">
-                    {children}
+                <main className="p-4 md:p-6 max-w-[1600px] mx-auto overflow-hidden">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={pathname}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -12 }}
+                            transition={{ duration: 0.28, ease: "easeInOut" }}
+                        >
+                            {children}
+                        </motion.div>
+                    </AnimatePresence>
                 </main>
             </div>
         </div>

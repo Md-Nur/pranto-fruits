@@ -30,16 +30,22 @@ export const productSchema = z.object({
     })).optional().default([]),
 });
 
-// Order Schema (Basic)
+// Order Schema (Modernized)
 export const orderSchema = z.object({
     shippingInfo: z.object({
-        name: z.string().min(2),
-        phone: z.string().regex(/^(\+88)?01[3-9]\d{8}$/),
-        address: z.string().min(5),
-        city: z.string().min(2),
-        area: z.string().optional(),
+        firstName: z.string().min(1, "First name is required"),
+        lastName: z.string().min(1, "Last name is required"),
+        phone: z.string().regex(/^(\+88)?01[3-9]\d{8}$/, "Invalid Bangladeshi phone number"),
+        address: z.string().min(5, "Address must be at least 5 characters"),
+        city: z.string().min(2, "City is required"),
+        zipCode: z.string().optional().or(z.literal("")),
+        deliveryType: z.enum(["home", "point"]),
     }),
-    paymentMethod: z.enum(["cod", "bkash", "card"]),
-    totalAmount: z.number().positive(),
-    orderItems: z.array(z.any()),
+    paymentMethod: z.enum(["cod", "bkash", "nagad"]),
+    paymentDetails: z.object({
+        senderNumber: z.string().regex(/^(\+88)?01[3-9]\d{8}$/, "Invalid sender number").optional().or(z.literal("")),
+        transactionId: z.string().min(4, "Transaction ID must be at least 4 characters").optional().or(z.literal("")),
+    }).nullable().optional(),
+    totalAmount: z.number().positive("Total amount must be positive"),
+    orderItems: z.array(z.any()).min(1, "Cart cannot be empty"),
 });

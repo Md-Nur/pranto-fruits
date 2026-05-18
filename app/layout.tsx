@@ -5,6 +5,8 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import PublicLayout from "../components/PublicLayout";
 import FacebookPixel from "@/components/FacebookPixel";
+import TopProgressBar from "@/components/TopProgressBar";
+import { Suspense } from "react";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -64,6 +66,9 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <FacebookPixel />
+        <Suspense fallback={null}>
+          <TopProgressBar />
+        </Suspense>
         <CartProvider>
           <WishlistProvider>
             <PublicLayout>

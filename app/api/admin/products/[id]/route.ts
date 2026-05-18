@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyAdmin } from "@/lib/admin-auth";
 import prisma from "@/lib/prisma";
+import { productSchema } from "@/lib/validation";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -29,8 +30,17 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
         const { id } = await params;
         const productId = parseInt(id);
+        
         const body = await req.json();
-        const { name, categoryId, basePrice, priceRange, description, image, images, details, isNew, variants } = body;
+        const validation = productSchema.safeParse(body);
+
+        if (!validation.success) {
+            return NextResponse.json({ 
+                error: validation.error.issues[0].message 
+            }, { status: 400 });
+        }
+
+        const { name, categoryId, basePrice, priceRange, description, image, images, details, isNew, variants } = validation.data;
 
         // Delete existing variants and recreate
         await prisma.productVariant.deleteMany({ where: { productId } });
@@ -39,8 +49,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             where: { id: productId },
             data: {
                 name,
-                categoryId: parseInt(categoryId.toString()),
-                basePrice: parseFloat(basePrice),
+                categoryId: categoryId,
+                basePrice: basePrice,
                 priceRange: priceRange || String(basePrice),
                 description,
                 image: image || (images && images.length > 0 ? images[0] : ""),
@@ -50,7 +60,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
                 variants: {
                     create: (variants || []).map((v: any) => ({
                         label: v.label,
-                        price: parseFloat(v.price),
+                        price: v.price,
                     })),
                 },
             },

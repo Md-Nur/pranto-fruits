@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { verifyJwt } from "@/lib/jwt-utils";
-import prisma from "@/lib/prisma";
 
 export async function verifyAdmin() {
     const cookieStore = await cookies();
@@ -16,23 +15,17 @@ export async function verifyAdmin() {
         return { error: "Invalid token", status: 401, user: null };
     }
 
-    const user = await prisma.user.findUnique({
-        where: { id: payload.id as number },
-        select: {
-            id: true,
-            name: true,
-            phone: true,
-            role: true,
-        },
-    });
-
-    if (!user) {
-        return { error: "User not found", status: 401, user: null };
-    }
-
-    if (user.role !== "ADMIN") {
+    if (payload.role !== "ADMIN") {
         return { error: "Forbidden: Admin access required", status: 403, user: null };
     }
 
-    return { error: null, status: 200, user };
+    return { 
+        error: null, 
+        status: 200, 
+        user: {
+            id: payload.id as number,
+            phone: payload.phone as string,
+            role: payload.role as string,
+        }
+    };
 }

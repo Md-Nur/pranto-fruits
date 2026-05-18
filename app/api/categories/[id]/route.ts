@@ -1,18 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
-import { verifyJwt } from "@/lib/jwt-utils";
-
-async function checkAdmin() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth-token")?.value;
-    if (!token) return false;
-    const payload = await verifyJwt(token);
-    return payload && payload.role === "ADMIN";
-}
+import { verifyAdmin } from "@/lib/admin-auth";
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    if (!(await checkAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const auth = await verifyAdmin();
+    if (auth.error) {
+        return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
 
     try {
         const data = await request.json();
@@ -34,7 +28,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    if (!(await checkAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const auth = await verifyAdmin();
+    if (auth.error) {
+        return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
 
     try {
         const resolvedParams = await params;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { ShoppingCart, Heart, Share2, CheckCircle2, ShieldCheck, Truck, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -17,6 +17,60 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
     const [activeTab, setActiveTab] = useState("wisdom");
     const { addToCart } = useCart();
     const router = useRouter();
+
+    // Database reviews state & handlers
+    const [reviews, setReviews] = useState<any[]>([]);
+    const [reviewsLoading, setReviewsLoading] = useState(true);
+    const [newReview, setNewReview] = useState({ name: "", text: "", rating: 5 });
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [reviewSuccess, setReviewSuccess] = useState(false);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const res = await fetch(`/api/products/${product.id}/reviews`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setReviews(Array.isArray(data) ? data : []);
+                }
+            } catch (error) {
+                console.error("Error fetching reviews:", error);
+            } finally {
+                setReviewsLoading(false);
+            }
+        };
+        fetchReviews();
+    }, [product.id]);
+
+    const handleSubmitReview = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newReview.name.trim() || !newReview.text.trim()) return;
+
+        setIsSubmittingReview(true);
+        try {
+            const res = await fetch(`/api/products/${product.id}/reviews`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newReview)
+            });
+
+            if (res.ok) {
+                const savedReview = await res.json();
+                setReviews((prev) => [savedReview, ...prev]);
+                setNewReview({ name: "", text: "", rating: 5 });
+                setReviewSuccess(true);
+                setTimeout(() => setReviewSuccess(false), 5000);
+            }
+        } catch (error) {
+            console.error("Error submitting review:", error);
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
+
+    const averageRating = reviews.length > 0
+        ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1)
+        : "5.0";
 
     const handleAddToCart = () => {
         addToCart({
@@ -199,7 +253,7 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
                             onClick={() => setActiveTab("reviews")}
                             className={cn("pb-4 transition-colors", activeTab === "reviews" ? "border-b-2 border-primary font-bold text-gray-900" : "text-gray-400 hover:text-gray-900")}
                         >
-                            Reviews (12)
+                            Reviews ({reviewsLoading ? "..." : reviews.length})
                         </button>
                     </div>
 
@@ -253,37 +307,105 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
                                 <h3 className="text-2xl font-bold text-gray-900 m-0">Customer Reviews</h3>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xl font-bold text-gray-900">4.8</span>
+                                    <span className="text-xl font-bold text-gray-900">{averageRating}</span>
                                     <div className="flex text-amber-400">
-                                        {"★★★★★".split("").map((star, i) => (
-                                            <span key={i} className={i === 4 ? "text-gray-300" : ""}>{star}</span>
+                                        {[1, 2, 3, 4, 5].map((starValue) => (
+                                            <span key={starValue} className={starValue > Math.round(Number(averageRating)) ? "text-gray-300" : ""}>★</span>
                                         ))}
                                     </div>
-                                    <span className="text-sm text-gray-500">(12 reviews)</span>
+                                    <span className="text-sm text-gray-500">({reviews.length} reviews)</span>
                                 </div>
                             </div>
                             
                             <div className="space-y-6">
-                                {[
-                                    { name: "Rahim U.", date: "Oct 12, 2023", text: "Absolutely fresh and delicious! Delivery was very fast and the packaging was excellent. Will definitely order again.", rating: 5 },
-                                    { name: "Salma K.", date: "Sep 28, 2023", text: "Great quality fruits. The size was a bit smaller than expected but the taste made up for it. Highly recommended.", rating: 4 },
-                                    { name: "Anisur R.", date: "Sep 15, 2023", text: "Best online grocery experience. The produce is top-notch and completely chemical-free as promised.", rating: 5 },
-                                ].map((review, i) => (
-                                    <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-50">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <h4 className="font-bold text-gray-900 m-0">{review.name}</h4>
-                                                <span className="text-xs text-gray-500">{review.date}</span>
+                                {reviewsLoading ? (
+                                    <div className="text-center py-6 text-gray-500 animate-pulse">Loading reviews...</div>
+                                ) : reviews.length > 0 ? (
+                                    reviews.map((review, i) => (
+                                        <div key={review.id || i} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-50">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <h4 className="font-bold text-gray-900 m-0">{review.name}</h4>
+                                                    <span className="text-xs text-gray-500">
+                                                        {new Date(review.createdAt).toLocaleDateString("en-US", {
+                                                            year: "numeric",
+                                                            month: "short",
+                                                            day: "numeric"
+                                                        })}
+                                                    </span>
+                                                </div>
+                                                <div className="flex text-amber-400 text-sm">
+                                                    {[1, 2, 3, 4, 5].map((starValue) => (
+                                                        <span key={starValue} className={starValue > review.rating ? "text-gray-300" : ""}>★</span>
+                                                    ))}
+                                                </div>
                                             </div>
-                                            <div className="flex text-amber-400 text-sm">
-                                                {"★★★★★".split("").map((star, j) => (
-                                                    <span key={j} className={j >= review.rating ? "text-gray-300" : ""}>{star}</span>
-                                                ))}
+                                            <p className="text-gray-600 m-0 text-sm leading-relaxed">{review.text}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8 text-gray-500">No reviews found. Be the first to leave one!</div>
+                                )}
+                            </div>
+
+                            {/* Write a Review Section */}
+                            <div className="mt-12 bg-gray-50/50 rounded-3xl p-6 md:p-8 border border-gray-100">
+                                <h4 className="text-xl font-bold text-gray-900 mb-6">Write a Review</h4>
+                                
+                                {reviewSuccess ? (
+                                    <div className="bg-emerald-50 text-emerald-850 border border-emerald-100 rounded-2xl p-4 text-center font-medium">
+                                        Thank you! Your review has been submitted successfully and is now live on the site.
+                                    </div>
+                                ) : (
+                                    <form onSubmit={handleSubmitReview} className="space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Your Name</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={newReview.name}
+                                                    onChange={(e) => setNewReview(prev => ({ ...prev, name: e.target.value }))}
+                                                    placeholder="e.g. Nayon Ali"
+                                                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-all"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Rating</label>
+                                                <div className="flex gap-1.5 pt-2">
+                                                    {[1, 2, 3, 4, 5].map((starValue) => (
+                                                        <button
+                                                            key={starValue}
+                                                            type="button"
+                                                            onClick={() => setNewReview(prev => ({ ...prev, rating: starValue }))}
+                                                            className="text-2xl transition-transform hover:scale-110"
+                                                        >
+                                                            <span className={starValue <= newReview.rating ? "text-amber-400" : "text-gray-300"}>★</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
-                                        <p className="text-gray-600 m-0 text-sm leading-relaxed">{review.text}</p>
-                                    </div>
-                                ))}
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Review Content</label>
+                                            <textarea
+                                                required
+                                                rows={4}
+                                                value={newReview.text}
+                                                onChange={(e) => setNewReview(prev => ({ ...prev, text: e.target.value }))}
+                                                placeholder="Tell us about the freshness, quality, and your delivery experience..."
+                                                className="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm focus:outline-none focus:border-primary transition-all animate-none"
+                                            />
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmittingReview}
+                                            className="bg-primary text-white font-bold px-6 py-3 rounded-xl hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 text-sm shadow-md"
+                                        >
+                                            {isSubmittingReview ? "Submitting..." : "Submit Review"}
+                                        </button>
+                                    </form>
+                                )}
                             </div>
                         </div>
                     )}
