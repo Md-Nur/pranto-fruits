@@ -1,15 +1,16 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 const CategoryBar = () => {
     const [categories, setCategories] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-
+    const searchParams = useSearchParams();
+    const selectedCategory = searchParams?.get("category") ?? "all";
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -66,7 +67,10 @@ const CategoryBar = () => {
                                 href={category.slug === "all" ? "/shop" : `/shop?category=${category.slug}`}
                                 className="flex flex-col items-center gap-3 min-w-[100px] group"
                             >
-                                <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-gray-100 group-hover:border-primary transition-all duration-300 shadow-sm">
+                                <div className={cn(
+                            "relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2",
+                            selectedCategory === category.slug ? "border-primary" : "border-gray-100"
+                        )}>
                                     <Image
                                         src={category.image}
                                         alt={category.name}
@@ -75,7 +79,10 @@ const CategoryBar = () => {
                                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
                                 </div>
-                                <span className="text-xs md:text-sm font-bold text-gray-700 group-hover:text-primary transition-colors text-center whitespace-nowrap">
+                                <span className={cn(
+                            "text-xs md:text-sm font-bold group-hover:text-primary transition-colors text-center whitespace-nowrap",
+                            selectedCategory === category.slug && "text-primary"
+                        )}>
                                     {category.name}
                                 </span>
                             </Link>
