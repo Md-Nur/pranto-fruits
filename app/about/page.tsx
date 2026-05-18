@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 export const metadata = {
     title: "আমাদের গল্প | Village Organic Fruits",
@@ -38,6 +39,47 @@ export default function AboutPage() {
                                 <li>কৃষকদের যথাযথ ও ন্যায্যমূল্য প্রদান</li>
                                 <li>দ্রুততম সময়ে তাজা ফল ডেলিভারি</li>
                             </ul>
+                        </section>
+
+                        <section className="pt-8 border-t border-gray-100">
+                            <h2 className="text-2xl font-bold text-organic-green mb-8 text-center">আমাদের নেতৃত্ব</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+                                {/* Founder & CEO */}
+                                <div className="group bg-surface rounded-3xl p-6 border border-gray-100 flex flex-col items-center text-center transition-all duration-300 hover:shadow-md">
+                                    <div className="relative w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-white shadow-md transition-transform duration-300 group-hover:scale-105">
+                                        <Image
+                                            src="/founder.jpeg"
+                                            alt="Md Nayon Ali"
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-w-768px) 160px, 160px"
+                                        />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-950 mb-1">Md Nayon Ali</h3>
+                                    <p className="text-sm font-semibold text-primary/90 mb-3 tracking-wider uppercase">Founder & CEO</p>
+                                    <p className="text-gray-500 text-sm leading-relaxed italic max-w-xs">
+                                        &ldquo;নিরাপদ ও ভেজালমুক্ত ফল সবার ঘরে ঘরে পৌঁছে দেওয়াই আমাদের একমাত্র অঙ্গীকার।&rdquo;
+                                    </p>
+                                </div>
+
+                                {/* Director */}
+                                <div className="group bg-surface rounded-3xl p-6 border border-gray-100 flex flex-col items-center text-center transition-all duration-300 hover:shadow-md">
+                                    <div className="relative w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-white shadow-md transition-transform duration-300 group-hover:scale-105">
+                                        <Image
+                                            src="/director.jpeg"
+                                            alt="Md Nahid Pervej"
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-w-768px) 160px, 160px"
+                                        />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-950 mb-1">Md Nahid Pervej</h3>
+                                    <p className="text-sm font-semibold text-primary/90 mb-3 tracking-wider uppercase">Director</p>
+                                    <p className="text-gray-500 text-sm leading-relaxed italic max-w-xs">
+                                        &ldquo;কৃষকদের মেধা ও গ্রাহকদের সুস্বাস্থ্যের মধ্যে একটি মজবুত সেতুবন্ধন তৈরি করতে আমরা নিরলস কাজ করে যাচ্ছি।&rdquo;
+                                    </p>
+                                </div>
+                            </div>
                         </section>
 
                         <section className="bg-primary/5 p-6 rounded-2xl mt-12 border border-primary/10 text-center">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Store,
     Phone,
@@ -12,7 +12,11 @@ import {
     ExternalLink,
     Shield,
     KeyRound,
-    Loader2
+    Loader2,
+    Truck,
+    RefreshCw,
+    AlertCircle,
+    CheckCircle2
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -34,6 +38,28 @@ export default function AdminSettingsPage() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Steadfast Courier Integration State
+    const [steadfastStatus, setSteadfastStatus] = useState<any>(null);
+    const [loadingSteadfast, setLoadingSteadfast] = useState(true);
+
+    const fetchSteadfastStatus = async () => {
+        setLoadingSteadfast(true);
+        try {
+            const res = await fetch("/api/admin/steadfast/balance");
+            const data = await res.json();
+            setSteadfastStatus(data);
+        } catch (error) {
+            console.error("Error fetching Steadfast status:", error);
+            setSteadfastStatus({ success: false, error: "Failed to load Steadfast status." });
+        } finally {
+            setLoadingSteadfast(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchSteadfastStatus();
+    }, []);
 
     const handlePasswordChange = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -100,6 +126,103 @@ export default function AdminSettingsPage() {
                         <p className="text-sm font-bold text-gray-900">Pure & Healthy</p>
                     </div>
                 </div>
+            </div>
+
+            {/* Steadfast Courier Integration */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                <div className="flex items-center justify-between gap-3 mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                            <Truck size={20} className="text-indigo-600" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-gray-900">Steadfast Courier Integration</h3>
+                            <p className="text-xs text-gray-400">Real-time status and billing balance for shipping</p>
+                        </div>
+                    </div>
+                    
+                    <button
+                        onClick={fetchSteadfastStatus}
+                        disabled={loadingSteadfast}
+                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-200 disabled:opacity-50"
+                        title="Refresh Status"
+                    >
+                        <RefreshCw size={18} className={loadingSteadfast ? "animate-spin text-indigo-600" : ""} />
+                    </button>
+                </div>
+
+                {loadingSteadfast ? (
+                    <div className="flex items-center justify-center py-8">
+                        <Loader2 className="animate-spin text-indigo-600 mr-2" size={24} />
+                        <span className="text-sm font-medium text-gray-500">Checking connectivity...</span>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {/* Status Badge */}
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Status:</span>
+                                {steadfastStatus?.success ? (
+                                    <span className="flex items-center gap-1 text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
+                                        <CheckCircle2 size={12} /> Connected & Active
+                                    </span>
+                                ) : !steadfastStatus?.configured ? (
+                                    <span className="flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                                        <AlertCircle size={12} /> Not Configured
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-1 text-xs font-bold text-red-700 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
+                                        <AlertCircle size={12} /> Connection Failed
+                                    </span>
+                                )}
+                            </div>
+                            
+                            {steadfastStatus?.success && (
+                                <span className="text-xs text-gray-500 font-medium">
+                                    Last checked: {new Date().toLocaleTimeString()}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Error Alert if failed */}
+                        {steadfastStatus?.error && (
+                            <div className="p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
+                                <AlertCircle size={18} className="text-red-600 shrink-0 mt-0.5" />
+                                <div>
+                                    <p className="text-xs font-bold text-red-800 uppercase tracking-wider">Connection Error</p>
+                                    <p className="text-xs text-red-600 mt-1">{steadfastStatus.error}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Connection Details Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Balance Card */}
+                            <div className="p-4 bg-gradient-to-br from-indigo-50/60 to-violet-50/40 border border-indigo-100/50 rounded-xl">
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Current Balance</p>
+                                <p className="text-2xl font-black text-indigo-700">
+                                    {steadfastStatus?.success ? `৳ ${steadfastStatus.balance}` : "—"}
+                                </p>
+                            </div>
+
+                            {/* Masked API Key */}
+                            <div className="p-4 bg-gray-50 rounded-xl">
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">API Key (Masked)</p>
+                                <p className="text-sm font-bold text-gray-700 font-mono">
+                                    {steadfastStatus?.configured && steadfastStatus?.apiKeyMasked ? steadfastStatus.apiKeyMasked : "Not Configured"}
+                                </p>
+                            </div>
+
+                            {/* Base URL */}
+                            <div className="p-4 bg-gray-50 rounded-xl">
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">API Endpoint</p>
+                                <p className="text-xs font-bold text-gray-500 font-mono truncate" title={steadfastStatus?.apiUrl || "https://portal.packzy.com/api/v1"}>
+                                    {steadfastStatus?.apiUrl || "https://portal.packzy.com/api/v1"}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Contact Information */}

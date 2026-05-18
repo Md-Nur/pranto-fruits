@@ -10,7 +10,7 @@ export interface SteadfastOrderPayload {
 export async function createSteadfastOrder(payload: SteadfastOrderPayload) {
     const API_KEY = process.env.STEADFAST_API_KEY;
     const SECRET_KEY = process.env.STEADFAST_SECRET_KEY;
-    const BASE_URL = process.env.STEADFAST_BASE_URL || "https://portal.steadfast.com.bd/api/v1";
+    const BASE_URL = process.env.STEADFAST_BASE_URL || "https://portal.packzy.com/api/v1";
 
     if (!API_KEY || !SECRET_KEY) {
         throw new Error("Steadfast API credentials are not configured.");
