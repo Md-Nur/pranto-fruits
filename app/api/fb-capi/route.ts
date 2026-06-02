@@ -74,7 +74,10 @@ export async function POST(request: Request) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data: capiData }),
+        body: JSON.stringify({
+          data: capiData,
+          ...(process.env.TEST_EVENT && { test_event_code: process.env.TEST_EVENT }),
+        }),
       }
     );
 
