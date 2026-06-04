@@ -4,6 +4,8 @@ import React from "react";
 import { Mail, Phone, MapPin, Clock, Send, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
+import { fbEvents } from "@/components/FacebookPixel";
+
 export default function ContactPage() {
     const [loading, setLoading] = React.useState(false);
     const [formData, setFormData] = React.useState({
@@ -28,6 +30,20 @@ export default function ContactPage() {
             const data = await res.json();
 
             if (res.ok) {
+                // Track lead event via Facebook Pixel
+                try {
+                    fbEvents.lead({
+                        content_name: "Bulk Inquiry Form",
+                        value: 0
+                    }, {
+                        em: formData.email,
+                        ph: formData.phone,
+                        fn: formData.contactPerson
+                    });
+                } catch (error) {
+                    console.error("Failed to track Lead event:", error);
+                }
+
                 toast.success("আপনার ইনকোয়ারি সফলভাবে সাবমিট করা হয়েছে!");
                 setFormData({
                     companyName: "",

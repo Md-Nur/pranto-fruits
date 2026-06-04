@@ -44,7 +44,7 @@ export default async function Home() {
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link
-                                href="/gardens"
+                                href="/farmers"
                                 className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark transition-all shadow-xl text-sm sm:text-lg flex items-center justify-center gap-2"
                             >
                                 Our Contracted Gardens

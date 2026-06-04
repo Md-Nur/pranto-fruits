@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
+import { fbEvents } from "@/components/FacebookPixel";
+
 export interface CartItem {
     id: number;
     name: string;
@@ -64,6 +66,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
             return [...prevCart, newItem];
         });
+
+        // Trigger Facebook Pixel AddToCart Event
+        try {
+            fbEvents.addToCart({
+                content_name: newItem.name,
+                content_ids: [String(newItem.id)],
+                value: newItem.price * newItem.quantity,
+                currency: "BDT"
+            });
+        } catch (error) {
+            console.error("Failed to trigger AddToCart event:", error);
+        }
+
         if (openCart) {
             setIsCartOpen(true);
         }

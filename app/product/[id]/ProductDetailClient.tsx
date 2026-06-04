@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { cn } from "@/lib/utils";
+import { fbEvents } from "@/components/FacebookPixel";
+import { useWishlist } from "@/context/WishlistContext";
 import { ProductWithVariants } from "@/components/ProductGrid";
 
 const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
@@ -16,7 +18,39 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
     const [activeImage, setActiveImage] = useState(productImages[0]);
     const [activeTab, setActiveTab] = useState("wisdom");
     const { addToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
     const router = useRouter();
+
+    // Trigger Facebook Pixel ViewContent Event
+    useEffect(() => {
+        try {
+            fbEvents.viewContent({
+                content_name: product.name,
+                content_ids: [String(product.id)],
+                value: selectedVariant?.price ?? product.basePrice,
+                currency: "BDT"
+            });
+        } catch (error) {
+            console.error("Failed to trigger ViewContent event:", error);
+        }
+    }, [product, selectedVariant]);
+
+    const handleToggleWishlist = () => {
+        const isAdding = !isInWishlist(product.id);
+        toggleWishlist(product.id);
+        if (isAdding) {
+            try {
+                fbEvents.addToWishlist({
+                    content_name: product.name,
+                    content_ids: [String(product.id)],
+                    value: selectedVariant?.price ?? product.basePrice,
+                    currency: "BDT"
+                });
+            } catch (error) {
+                console.error("Failed to trigger AddToWishlist event:", error);
+            }
+        }
+    };
 
     // Database reviews state & handlers
     const [reviews, setReviews] = useState<any[]>([]);
@@ -204,8 +238,17 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
                         >
                             Buy it Now
                         </button>
-                        <button className="w-16 h-16 rounded-full border-2 border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-100 transition-all">
-                            <Heart size={24} />
+                        <button 
+                            onClick={handleToggleWishlist}
+                            className={cn(
+                                "w-16 h-16 rounded-full border-2 flex items-center justify-center transition-all duration-200",
+                                isInWishlist(product.id)
+                                    ? "bg-red-50 border-red-100 text-red-500"
+                                    : "border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100"
+                            )}
+                            aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
+                        >
+                            <Heart size={24} className={cn(isInWishlist(product.id) && "fill-current")} />
                         </button>
                     </div>
 

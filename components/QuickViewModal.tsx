@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { X, ShoppingCart, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +8,7 @@ import { ProductWithVariants } from "./ProductGrid";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { cn } from "@/lib/utils";
+import { fbEvents } from "@/components/FacebookPixel";
 
 interface QuickViewModalProps {
     product: ProductWithVariants | null;
@@ -17,6 +18,39 @@ interface QuickViewModalProps {
 const QuickViewModal = ({ product, onClose }: QuickViewModalProps) => {
     const { addToCart } = useCart();
     const { toggleWishlist, isInWishlist } = useWishlist();
+
+    useEffect(() => {
+        if (product) {
+            try {
+                fbEvents.viewContent({
+                    content_name: product.name,
+                    content_ids: [String(product.id)],
+                    value: product.variants[0]?.price ?? product.basePrice,
+                    currency: "BDT"
+                });
+            } catch (error) {
+                console.error("Failed to trigger ViewContent event in QuickView:", error);
+            }
+        }
+    }, [product]);
+
+    const handleToggleWishlist = () => {
+        if (!product) return;
+        const isAdding = !isInWishlist(product.id);
+        toggleWishlist(product.id);
+        if (isAdding) {
+            try {
+                fbEvents.addToWishlist({
+                    content_name: product.name,
+                    content_ids: [String(product.id)],
+                    value: product.variants[0]?.price ?? product.basePrice,
+                    currency: "BDT"
+                });
+            } catch (error) {
+                console.error("Failed to trigger AddToWishlist event in QuickView:", error);
+            }
+        }
+    };
 
     if (!product) return null;
 
@@ -100,7 +134,7 @@ const QuickViewModal = ({ product, onClose }: QuickViewModalProps) => {
                                     </button>
 
                                     <button
-                                        onClick={() => toggleWishlist(product.id)}
+                                        onClick={handleToggleWishlist}
                                         className={cn(
                                             "w-full py-4 rounded-2xl border-2 font-bold transition-all flex items-center justify-center gap-3",
                                             isInWishlist(product.id)

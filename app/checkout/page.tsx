@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { ArrowLeft, CheckCircle2, ChevronRight, Truck, Loader2, AlertCircle, Minus, Plus, Trash2 } from "lucide-react";
 import FruitLoading from "@/components/FruitLoading";
+import { fbEvents } from "@/components/FacebookPixel";
 
 export default function CheckoutPage() {
     const { cart, cartTotal, clearCart, updateQuantity, removeFromCart } = useCart();
@@ -17,6 +18,21 @@ export default function CheckoutPage() {
     const [user, setUser] = useState<any>(null);
     const [error, setError] = useState("");
     const [placedOrderId, setPlacedOrderId] = useState<number | null>(null);
+
+    // Track InitiateCheckout when the user lands on the checkout page with items
+    useEffect(() => {
+        if (cart.length > 0 && step === 1) {
+            try {
+                fbEvents.initiateCheckout({
+                    value: cartTotal,
+                    currency: "BDT",
+                    num_items: cart.reduce((count, item) => count + item.quantity, 0)
+                });
+            } catch (error) {
+                console.error("Failed to track InitiateCheckout event:", error);
+            }
+        }
+    }, [step, cart.length, cartTotal]);
 
     const [paymentMethod, setPaymentMethod] = useState("cod");
     const [paymentDetails, setPaymentDetails] = useState({
@@ -144,6 +160,22 @@ export default function CheckoutPage() {
                 } catch {
                     // Non-critical: ignore profile save errors
                 }
+            }
+
+            // Track Purchase event via Facebook Pixel / Conversions API
+            try {
+                fbEvents.purchase({
+                    value: total,
+                    currency: "BDT",
+                    content_ids: cart.map(item => String(item.id)),
+                    num_items: cart.reduce((count, item) => count + item.quantity, 0)
+                }, {
+                    ph: shippingInfo.phone,
+                    fn: shippingInfo.firstName,
+                    ln: shippingInfo.lastName
+                });
+            } catch (error) {
+                console.error("Failed to track Purchase event:", error);
             }
 
             // Clear the cart after successful order

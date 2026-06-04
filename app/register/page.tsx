@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, User, Lock, Loader2, AlertCircle, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import FruitLoading from "@/components/FruitLoading";
 
+import { trackFBEvent } from "@/components/FacebookPixel";
+
 function RegisterContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -59,6 +61,16 @@ function RegisterContent() {
 
             if (!res.ok) {
                 throw new Error(data.error || "Registration failed");
+            }
+
+            // Track CompleteRegistration event via Facebook Pixel / CAPI
+            try {
+                trackFBEvent("CompleteRegistration", undefined, {
+                    ph: formData.phone,
+                    fn: formData.name
+                });
+            } catch (error) {
+                console.error("Failed to track CompleteRegistration event:", error);
             }
 
             // Successful registration

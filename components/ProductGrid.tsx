@@ -10,6 +10,8 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import QuickViewModal from "./QuickViewModal";
 
+import { fbEvents } from "@/components/FacebookPixel";
+
 export interface ProductWithVariants {
     id: number;
     name: string;
@@ -32,6 +34,23 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
     const { addToCart } = useCart();
     const { toggleWishlist, isInWishlist } = useWishlist();
     const router = useRouter();
+
+    const handleToggleWishlist = (product: ProductWithVariants) => {
+        const isAdding = !isInWishlist(product.id);
+        toggleWishlist(product.id);
+        if (isAdding) {
+            try {
+                fbEvents.addToWishlist({
+                    content_name: product.name,
+                    content_ids: [String(product.id)],
+                    value: product.variants[0]?.price ?? product.basePrice,
+                    currency: "BDT"
+                });
+            } catch (error) {
+                console.error("Failed to trigger AddToWishlist event:", error);
+            }
+        }
+    };
 
     // Derive dynamic categories from products
     const uniqueCategories = [
@@ -125,7 +144,7 @@ const ProductGrid = ({ products }: { products: ProductWithVariants[] }) => {
                                         <Eye size={18} />
                                     </button>
                                     <button
-                                        onClick={() => toggleWishlist(product.id)}
+                                        onClick={() => handleToggleWishlist(product)}
                                         className={cn(
                                             "w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-md duration-200 sm:opacity-0 sm:scale-75 sm:translate-x-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 delay-75",
                                             isInWishlist(product.id)

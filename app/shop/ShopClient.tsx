@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import ProductGrid, { ProductWithVariants } from "@/components/ProductGrid";
 import { ProductGridSkeleton } from "@/components/ProductSkeleton";
+import { fbEvents } from "@/components/FacebookPixel";
 
 export default function ShopClient({ query, category }: { query?: string; category?: string }) {
     const [products, setProducts] = useState<ProductWithVariants[]>([]);
@@ -20,6 +21,15 @@ export default function ShopClient({ query, category }: { query?: string; catego
                 if (!res.ok) throw new Error("Failed to fetch products");
                 const data = await res.json();
                 setProducts(data);
+
+                // Track search event via Facebook Pixel
+                if (query) {
+                    try {
+                        fbEvents.search(query);
+                    } catch (error) {
+                        console.error("Failed to track Search event:", error);
+                    }
+                }
             } catch (error) {
                 console.error("Search error:", error);
             } finally {
