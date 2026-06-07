@@ -1,71 +1,60 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
     ArrowLeft,
-    CheckCircle2,
-    Truck,
+    ShoppingCart,
+    Check,
     Minus,
     Plus,
-    ShieldCheck,
-    Leaf,
-    Star,
+    Banknote,
+    Lock,
     Package,
-    Phone,
-    MapPin,
+    ArrowRight,
+    X,
+    CheckCircle,
     Loader2,
-    ChevronDown,
 } from "lucide-react";
 
-/* ─────────────── Product Data ─────────────── */
-const PRODUCTS = [
-    {
-        id: "11kg",
-        label: "হিমসাগর আম ১১ কেজি",
-        weight: "11kg",
-        originalPrice: 1749,
-        price: 1590,
-        image: "/himsagar-mango-product.png",
-    },
-    {
-        id: "22kg",
-        label: "হিমসাগর আম ২২ কেজি",
-        weight: "22kg",
-        originalPrice: 3500,
-        price: 3150,
-        image: "/himsagar-mango-product.png",
-    },
-];
+/* ─── Exact product data from reference ─── */
+const MAIN_PRODUCT = {
+    id: "himsagar-11kg",
+    name: "Himshagor Mango-11kg",
+    label: "হিমসাগর আম ১১ কেজি",
+    weight: "11kg",
+    originalPrice: 1749,
+    price: 1590,
+    image: "/himsagar-product-main.png",
+};
+
+const ADDON_PRODUCT = {
+    id: "himsagar-22kg",
+    name: "Himshagor Mango 22 KG",
+    label: "হিমসাগর আম ২২ কেজি",
+    weight: "22kg",
+    price: 3150,
+    image: "/himsagar-product-addon.png",
+};
 
 const FEATURES = [
-    "এটি অত্যন্ত মিষ্টি ও রসালো হয়ে থাকে।",
-    "পাকার পর এই আম থেকে একটি বিশেষ ও তীব্র মিষ্টি সুগন্ধ বের হয়।",
-    "প্রতিটি আমের গড় ওজন ২৫০-৩০০ গ্রাম হয়।",
-    "এই হিমসাগর আম ৩-৪ টিতে ১ কেজি হয়।",
-    "আত্মীয় বা পরিবারকে মৌসুমী উপহার হিসেবে পাঠানোর জন্য দারুণ।",
+    "এটি অত্যন্ত মিষ্টি ও রসালো হয়ে থাকে।",
+    "পাকার পর এই আম থেকে একটি বিশেষ ও তীব্র মিষ্টি সুগন্ধ বের হয়।",
+    "প্রতিটি আমের গড় ওজন ২৫০-৩০০ গ্রাম হয়।",
+    "এই হিমসাগর আম ৩-৪ টিতে ১ কেজি হয়।",
+    "আত্মীয় বা পরিবারকে মৌসুমী উপহার হিসেবে পাঠানোর জন্য দারুণ",
     "অনন্য স্বাদের জন্য এটি বাংলাদেশের (GI) পণ্য হিসেবে স্বীকৃত।",
 ];
 
-const TRUST_BADGES = [
-    { icon: ShieldCheck, title: "১০০% আসল", desc: "চাঁপাইনবাবগঞ্জ থেকে সরাসরি" },
-    { icon: Leaf, title: "ক্যামিকেলমুক্ত", desc: "প্রাকৃতিকভাবে পাকানো" },
-    { icon: Truck, title: "হোম ডেলিভারি", desc: "সারা বাংলাদেশে" },
-    { icon: Star, title: "GI স্বীকৃত", desc: "বাংলাদেশের তৃতীয় GI পণ্য" },
-];
-
-/* ─────────────── Component ─────────────── */
 export default function HimsagarMangoLandingPage() {
-    // Cart / product selection
-    const [selectedProduct, setSelectedProduct] = useState(PRODUCTS[0]);
+    // Product section state
+    const [mainIncluded, setMainIncluded] = useState(true);
     const [quantity, setQuantity] = useState(1);
-    const [addOns, setAddOns] = useState<Record<string, boolean>>({});
+    const [addonIncluded, setAddonIncluded] = useState(false);
+    const [addonQty, setAddonQty] = useState(1);
+    const [shippingType, setShippingType] = useState<"dhaka" | "urgent">("dhaka");
 
-    // Delivery
-    const [deliveryZone, setDeliveryZone] = useState<"dhaka" | "outside">("dhaka");
-
-    // Form
+    // Form state
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
@@ -73,81 +62,72 @@ export default function HimsagarMangoLandingPage() {
     // UI state
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
-    const [orderId, setOrderId] = useState<number | null>(null);
     const [success, setSuccess] = useState(false);
+    const [orderId, setOrderId] = useState<number | null>(null);
 
-    /* ─── Pricing ─── */
-    const addOnTotal = PRODUCTS.filter(
-        (p) => addOns[p.id] && p.id !== selectedProduct.id
-    ).reduce((sum, p) => sum + p.price, 0);
+    // Cart Count auto-syncs to item quantities
+    const cartCount = (mainIncluded ? quantity : 0) + (addonIncluded ? addonQty : 0);
 
-    const productSubtotal = selectedProduct.price * quantity;
-    const subtotal = productSubtotal + addOnTotal;
-    const deliveryCharge = 0; // free for both zones in this campaign
+    // Scroll to order form
+    const scrollToOrder = () => {
+        document.getElementById("product-checkout")?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    /* ─── Totals ─── */
+    const mainSubtotal = mainIncluded ? MAIN_PRODUCT.price * quantity : 0;
+    const addonSubtotal = addonIncluded ? ADDON_PRODUCT.price * addonQty : 0;
+    const subtotal = mainSubtotal + addonSubtotal;
+    const deliveryCharge = 0;
     const total = subtotal + deliveryCharge;
 
-    /* ─── Order Submission ─── */
-    const handleOrder = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!name.trim() || !phone.trim() || !address.trim()) {
-            setError("সব তথ্য পূরণ করুন।");
-            return;
+    // Handle auto-redirect on success
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => {
+                window.location.href = "/";
+            }, 5000);
+            return () => clearTimeout(timer);
         }
-        if (!/^(\\+88)?01[3-9]\\d{8}$/.test(phone)) {
-            setError("সঠিক মোবাইল নম্বর দিন (১১ ডিজিট)।");
-            return;
-        }
+    }, [success]);
+
+    /* ─── Place Order ─── */
+    const handlePlaceOrder = async () => {
+        if (!name.trim()) { setError("নাম লিখুন"); return; }
+        if (!phone.trim() || !/^(\+88)?01[3-9]\d{8}$/.test(phone)) { setError("সঠিক মোবাইল নম্বর দিন"); return; }
+        if (!address.trim() || address.trim().length < 5) { setError("সঠিক ঠিকানা লিখুন"); return; }
+        if (!mainIncluded && !addonIncluded) { setError("কমপক্ষে একটি পণ্য নির্বাচন করুন"); return; }
 
         setIsLoading(true);
         setError("");
 
-        // Build order items
         const orderItems = [
-            {
-                id: selectedProduct.id,
-                name: selectedProduct.label,
-                variant: selectedProduct.weight,
-                price: selectedProduct.price,
-                quantity,
-                image: selectedProduct.image,
-            },
-            ...PRODUCTS.filter((p) => addOns[p.id] && p.id !== selectedProduct.id).map(
-                (p) => ({
-                    id: p.id,
-                    name: p.label,
-                    variant: p.weight,
-                    price: p.price,
-                    quantity: 1,
-                    image: p.image,
-                })
-            ),
+            ...(mainIncluded ? [{ id: MAIN_PRODUCT.id, name: MAIN_PRODUCT.name, variant: MAIN_PRODUCT.weight, price: MAIN_PRODUCT.price, quantity, image: MAIN_PRODUCT.image }] : []),
+            ...(addonIncluded ? [{ id: ADDON_PRODUCT.id, name: ADDON_PRODUCT.name, variant: ADDON_PRODUCT.weight, price: ADDON_PRODUCT.price, quantity: addonQty, image: ADDON_PRODUCT.image }] : []),
         ];
 
         const nameParts = name.trim().split(" ");
-        const payload = {
-            shippingInfo: {
-                firstName: nameParts[0] || name,
-                lastName: nameParts.slice(1).join(" ") || ".",
-                phone,
-                address,
-                city: deliveryZone === "dhaka" ? "dhaka" : "other",
-                zipCode: "",
-                deliveryType: "home",
-            },
-            paymentMethod: "cod",
-            paymentDetails: null,
-            totalAmount: total,
-            orderItems,
-        };
-
         try {
             const res = await fetch("/api/checkout", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({
+                    shippingInfo: {
+                        firstName: nameParts[0] || name,
+                        lastName: nameParts.slice(1).join(" ") || ".",
+                        phone,
+                        address,
+                        city: shippingType === "dhaka" ? "dhaka" : "other",
+                        zipCode: "",
+                        deliveryType: "home",
+                    },
+                    paymentMethod: "cod",
+                    paymentDetails: null,
+                    totalAmount: total,
+                    orderItems,
+                }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "অর্ডার দিতে সমস্যা হয়েছে।");
+            if (!res.ok) throw new Error(data.error || "অর্ডার ব্যর্থ হয়েছে");
             setOrderId(data.orderId);
             setSuccess(true);
         } catch (err: any) {
@@ -157,494 +137,539 @@ export default function HimsagarMangoLandingPage() {
         }
     };
 
-    /* ─────────── Success Screen ─────────── */
-    if (success) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex flex-col items-center justify-center p-6 text-center">
-                <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full">
-                    <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle2 className="w-12 h-12 text-green-600" />
-                    </div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-3">অর্ডার সফল হয়েছে!</h1>
-                    <p className="text-gray-500 mb-6">
-                        আপনার অর্ডার গ্রহণ করা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।
-                    </p>
-                    <div className="bg-green-50 rounded-2xl p-5 mb-8">
-                        <p className="text-sm text-gray-500 mb-1">অর্ডার নম্বর</p>
-                        <p className="text-2xl font-bold text-green-700">#ORD-{orderId}</p>
-                    </div>
-                    <Link
-                        href="/"
-                        className="inline-block w-full py-4 bg-green-600 text-white rounded-xl font-bold text-lg hover:bg-green-700 transition-colors"
-                    >
-                        হোমপেজে ফিরুন
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
-    /* ─────────── Main Layout ─────────── */
     return (
-        <div className="min-h-screen bg-white font-sans" style={{ fontFamily: "'Hind Siliguri', 'Inter', sans-serif" }}>
-            {/* ── Top Nav Bar ── */}
-            <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
-                <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 text-gray-700 hover:text-green-700 transition-colors font-medium text-sm">
-                        <ArrowLeft className="w-4 h-4" />
-                        <span className="hidden sm:inline">দোকানে ফিরুন</span>
-                    </Link>
-                    <div className="flex items-center gap-2">
-                        <span className="text-xl">🥭</span>
-                        <span className="font-bold text-gray-900 text-sm sm:text-base">হিমসাগর আম — বিশেষ অফার</span>
-                    </div>
-                    <a href="#order-form" className="px-4 py-2 bg-green-600 text-white rounded-full text-sm font-bold hover:bg-green-700 transition-colors">
-                        অর্ডার করুন
-                    </a>
-                </div>
+        <>
+            {/* ── Inline CSS matching reference exactly ── */}
+            <style>{`
+                body { margin: 0; padding: 0; }
+                .landing-page { min-height: 100vh; background: #f8fafc; }
+                .landing-page-wrapper { max-width: 1280px; margin: 0 auto; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.1); min-height: 100vh; position: relative; }
+                @media (max-width: 1280px) { .landing-page-wrapper { margin: 0; box-shadow: none; } }
+                
+                .landing-section { padding: 4rem 0; }
+                
+                .hero-section { position: relative; display: flex; align-items: center; justify-content: center; }
+                .hero-content { position: relative; z-index: 10; height: 100%; display: flex; align-items: center; justify-content: center; }
+                
+                .cta-button { display: inline-flex; align-items: center; padding: 0.75rem 2rem; border-radius: 0.5rem; font-weight: 600; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; font-size: 1rem; }
+                .cta-button.primary { background: #10b981; color: white; }
+                .cta-button.primary:hover { background: #059669; }
+                
+                .landing-nav { position: fixed; top: 20px; left: 20px; z-index: 1000; }
+                .landing-nav-btn { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.1); border-radius: 50px; padding: 12px 20px; display: flex; align-items: center; gap: 8px; text-decoration: none; color: #374151; font-weight: 600; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                .landing-nav-btn:hover { background: white; transform: translateY(-2px); color: #10b981; box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+                
+                .landing-cart { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+                .landing-cart-btn { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 50px; padding: 12px 20px; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(16,185,129,0.3); }
+                .landing-cart-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16,185,129,0.4); }
+                .landing-cart-badge { background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; margin-left: 4px; }
+                
+                .landing-shipping-card { cursor: pointer; transition: all 0.2s; }
+                .landing-shipping-card:hover { border-color: #9ca3af !important; background-color: #f9fafb !important; }
+                .landing-shipping-card.selected { border-color: #16a34a !important; background-color: #dcfce7 !important; }
+                
+                .specialties-section { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); position: relative; overflow: hidden; }
+                .specialties-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23059669" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23059669" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat; opacity: 0.3; z-index: 0; }
+                .specialties-section > .container { position: relative; z-index: 1; }
+                .specialties-section .container { max-width: 1100px; }
+                .specialties-section h2 { line-height: 1.2; }
+                .specialties-section .grid { align-items: center; }
+                
+                .product-checkout-section { background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); padding: 4rem 0; }
+                
+                .hero-text-box { backdrop-filter: blur(10px); animation: fadeInUp 1s ease-out; }
+                @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+                .hero-image-responsive { background-size: cover; background-position: center; background-repeat: no-repeat; }
+                
+                @media (max-width: 768px) {
+                    .hero-section.hero-image-responsive::before { display: none; }
+                    .hero-section.hero-image-responsive { min-height: min(72vw, 300px) !important; height: auto !important; padding-top: 10px !important; padding-bottom: 10px !important; background-size: contain !important; background-position: center top !important; background-color: #ecfdf5; align-items: flex-start; }
+                    .hero-section.hero-image-responsive .hero-content { padding-top: 0; width: 100%; }
+                    .landing-section { padding: 2rem 0; }
+                    .landing-nav { top: 10px; left: 10px; }
+                    .landing-cart { top: 10px; right: 10px; }
+                    .specialties-section { padding: 2rem 0; }
+                    .specialties-section .container { padding-left: 1rem; padding-right: 1rem; }
+                    .specialties-section .grid { gap: 10px; row-gap: 10px; column-gap: 10px; }
+                    .specialties-section .specialties-image-wrap > div.rounded-xl { display: block !important; line-height: 0; }
+                    .specialties-section .specialties-image-wrap .landing-fit-img { display: block; margin: 0; vertical-align: bottom; }
+                    .specialties-section h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+                    .specialties-section .space-y-3 > * + * { margin-top: 0.75rem; }
+                }
+                
+                .landing-fit-img { max-width: 100%; width: 100%; height: auto; object-fit: contain; vertical-align: middle; }
+                input[type="checkbox"] { accent-color: #16a34a; width: 1.25rem; height: 1.25rem; }
+                
+                .supporting-item-card { transition: all 0.2s ease; }
+                .supporting-item-card.selected { border-color: #16a34a !important; box-shadow: 0 4px 6px -1px rgba(22,163,74,0.3); }
+                @media (min-width: 768px) {
+                    .supporting-item-card.selected { transform: translateY(-2px); }
+                }
+                @media (max-width: 767px) {
+                    .supporting-item-card.selected { background-color: #f0fdf4; }
+                }
+                
+                @keyframes slideDown { from { opacity: 0; max-height: 0; transform: translateY(-10px); } to { opacity: 1; max-height: 100px; transform: translateY(0); } }
+                .supporting-item-quantity { animation: slideDown 0.2s ease-out; }
+                .main-qty-btn { transition: all 0.2s; }
+                .main-qty-btn:active { transform: scale(0.95); }
+                
+                @keyframes bounce-in {
+                    0% { transform: scale(0.3); opacity: 0; }
+                    50% { transform: scale(1.05); }
+                    70% { transform: scale(0.9); }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+                .animate-bounce-in { animation: bounce-in 0.5s ease-out forwards; }
+            `}</style>
+
+            {/* ── Fixed Nav ── */}
+            <div className="landing-nav">
+                <Link href="/" className="landing-nav-btn">
+                    <ArrowLeft style={{ width: 16, height: 16 }} />
+                    <span>Back to Shop</span>
+                </Link>
             </div>
 
-            {/* ── Hero Section ── */}
-            <section className="relative min-h-[70vh] flex items-end overflow-hidden pt-16">
-                <Image
-                    src="/himsagar-mango-hero.png"
-                    alt="Himsagar Mango"
-                    fill
-                    className="object-cover"
-                    priority
-                />
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                {/* Hero content */}
-                <div className="relative z-10 w-full px-6 pb-16 max-w-5xl mx-auto">
-                    <div className="inline-flex items-center gap-2 bg-amber-400 text-amber-900 px-4 py-1.5 rounded-full text-xs font-bold mb-4 shadow">
-                        <span>🏅</span> বাংলাদেশের GI স্বীকৃত পণ্য
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4 drop-shadow-lg">
-                        চাঁপাইনবাবগঞ্জের<br />
-                        <span className="text-amber-400">হিমসাগর আম</span>
-                    </h1>
-                    <p className="text-white/85 text-lg md:text-xl max-w-2xl mb-8 leading-relaxed">
-                        আমের রাজা — অগ্রিম টাকা ছাড়াই ক্যাশ অন ডেলিভারিতে অর্ডার করুন
-                    </p>
-                    <div className="flex flex-wrap gap-3">
-                        <a
-                            href="#order-form"
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-green-500 hover:bg-green-400 text-white font-bold rounded-xl text-lg transition-all shadow-xl hover:shadow-green-400/30 hover:-translate-y-0.5"
-                        >
-                            এখনই অর্ডার করুন
-                        </a>
-                        <a
-                            href="#features"
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-white/15 backdrop-blur-sm border border-white/30 text-white font-bold rounded-xl text-lg hover:bg-white/25 transition-all"
-                        >
-                            আরও জানুন <ChevronDown className="w-5 h-5" />
-                        </a>
-                    </div>
-                </div>
-            </section>
+            {/* ── Fixed Cart ── */}
+            <div className="landing-cart">
+                <button onClick={scrollToOrder} className="landing-cart-btn">
+                    <ShoppingCart style={{ width: 16, height: 16 }} />
+                    <span>Cart</span>
+                    <span className="landing-cart-badge">{cartCount}</span>
+                </button>
+            </div>
 
-            {/* ── Trust Badges ── */}
-            <section className="bg-amber-50 border-y border-amber-100">
-                <div className="max-w-5xl mx-auto px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {TRUST_BADGES.map((b) => (
-                        <div key={b.title} className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <b.icon className="w-5 h-5 text-green-700" />
-                            </div>
-                            <div>
-                                <p className="font-bold text-gray-900 text-sm">{b.title}</p>
-                                <p className="text-xs text-gray-500">{b.desc}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
+            {/* ── Landing Page ── */}
+            <div className="landing-page">
+                <div className="landing-page-wrapper">
 
-            {/* ── About Section ── */}
-            <section className="py-16 bg-gradient-to-b from-emerald-50 to-white">
-                <div className="max-w-4xl mx-auto px-6 text-center">
-                    <div className="inline-block bg-green-100 text-green-800 px-4 py-1.5 rounded-full text-sm font-bold mb-5">
-                        হিমসাগর আম সম্পর্কে জানুন
-                    </div>
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
-                        চাঁপাইনবাবগঞ্জের বিখ্যাত<br />
-                        <span className="text-green-700">হিমসাগর বা ক্ষীরসাপাত আম</span>
-                    </h2>
-                    <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto">
-                        চাঁপাইনবাবগঞ্জের হিমসাগর আম বাংলাদেশের অন্যতম সেরা এবং সুস্বাদু আম,
-                        যা স্থানীয়ভাবে ক্ষীরসাপাত নামে সর্বাধিক পরিচিত। এটি স্বাদে-গন্ধে
-                        অতুলনীয় এবং জনপ্রিয়তার কারণে একে <strong>"আমের রাজা"</strong> বলা হয়।
-                        ২০১৯ সালে এই আমটি বাংলাদেশের ৩য় ভৌগোলিক নির্দেশক (GI) পণ্য হিসেবে
-                        আনুষ্ঠানিক স্বীকৃতি লাভ করে।
-                    </p>
-                </div>
-            </section>
-
-            {/* ── Features Section ── */}
-            <section id="features" className="py-16 bg-white">
-                <div className="max-w-5xl mx-auto px-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                        {/* Image */}
-                        <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] order-last lg:order-first">
-                            <Image
-                                src="/himsagar-mango-product.png"
-                                alt="Himsagar Mango Features"
-                                fill
-                                className="object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                            <div className="absolute bottom-4 left-4 bg-amber-400 text-amber-900 px-3 py-1.5 rounded-full text-sm font-bold">
-                                ২৫০-৩০০ গ্রাম প্রতিটি আম
-                            </div>
-                        </div>
-                        {/* Features */}
-                        <div>
-                            <div className="inline-block bg-green-100 text-green-800 px-4 py-1.5 rounded-full text-sm font-bold mb-5">
-                                হিমসাগর আমের বৈশিষ্ট্য
-                            </div>
-                            <h2 className="text-3xl font-extrabold text-gray-900 mb-8 leading-tight">
-                                কেন হিমসাগর আম<br />
-                                <span className="text-green-700">এত বিশেষ?</span>
-                            </h2>
-                            <ul className="space-y-4">
-                                {FEATURES.map((f, i) => (
-                                    <li key={i} className="flex items-start gap-3">
-                                        <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-0.5">
-                                            <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                                        </div>
-                                        <p className="text-gray-700 text-base leading-relaxed">{f}</p>
-                                    </li>
-                                ))}
-                            </ul>
-                            <a
-                                href="#order-form"
-                                className="mt-8 inline-flex items-center gap-2 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-base transition-all shadow-lg hover:shadow-green-600/30"
-                            >
-                                এখনই অর্ডার করুন
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* ── CTA Banner ── */}
-            <section className="py-14 bg-gradient-to-r from-green-700 via-emerald-600 to-teal-600">
-                <div className="max-w-4xl mx-auto px-6 text-center">
-                    <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4 leading-tight">
-                        অগ্রিম টাকা ছাড়াই অর্ডার করুন<br />
-                        <span className="text-amber-300">চাঁপাইনবাবগঞ্জের প্রিমিয়াম হিমসাগর আম!</span>
-                    </h2>
-                    <p className="text-white/80 mb-8 text-lg">পণ্য হাতে পেলে তারপর টাকা দিন — কোনো ঝুঁকি নেই!</p>
-                    <a
-                        href="#order-form"
-                        className="inline-flex items-center gap-2 px-10 py-4 bg-amber-400 hover:bg-amber-300 text-amber-900 font-bold rounded-xl text-lg transition-all shadow-xl"
+                    {/* SECTION 1 — Hero (background image, no text) */}
+                    <section
+                        id="section-249"
+                        className="hero-section overflow-hidden hero-image-responsive"
+                        style={{
+                            backgroundImage: "url('/himsagar-hero-1.png')",
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            backgroundRepeat: "no-repeat",
+                            height: 600,
+                        }}
                     >
-                        অর্ডার করতে ক্লিক করুন →
-                    </a>
-                </div>
-            </section>
-
-            {/* ── Order Section ── */}
-            <section id="order-form" className="py-16 bg-gray-50">
-                <div className="max-w-4xl mx-auto px-4">
-                    <div className="text-center mb-10">
-                        <div className="inline-block bg-green-100 text-green-800 px-4 py-1.5 rounded-full text-sm font-bold mb-4">
-                            অর্ডার করুন
-                        </div>
-                        <h2 className="text-3xl font-extrabold text-gray-900">
-                            আপনার হিমসাগর আম অর্ডার করুন
-                        </h2>
-                    </div>
-
-                    <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-                        {/* Product Selection */}
-                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 border-b border-green-100">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <Package className="w-5 h-5 text-green-600" />
-                                আপনার পণ্য নির্বাচন করুন
-                            </h3>
-                            <div className="space-y-3">
-                                {PRODUCTS.map((product) => (
-                                    <div
-                                        key={product.id}
-                                        onClick={() => setSelectedProduct(product)}
-                                        className={`flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                                            selectedProduct.id === product.id
-                                                ? "border-green-500 bg-green-50 shadow-md"
-                                                : "border-gray-200 bg-white hover:border-green-300"
-                                        }`}
-                                    >
-                                        <input
-                                            type="radio"
-                                            checked={selectedProduct.id === product.id}
-                                            onChange={() => setSelectedProduct(product)}
-                                            className="w-5 h-5 text-green-600 accent-green-600"
-                                        />
-                                        <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100">
-                                            <Image src={product.image} alt={product.label} width={56} height={56} className="w-full h-full object-cover" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="font-bold text-gray-900">{product.label}</h4>
-                                            <p className="text-xs text-gray-500 mt-0.5">ক্যাশ অন ডেলিভারি</p>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-sm line-through text-gray-400">৳{product.originalPrice.toLocaleString()}</span>
-                                                <span className="text-lg font-extrabold text-green-700">৳{product.price.toLocaleString()}</span>
-                                            </div>
-                                        </div>
-                                        {selectedProduct.id === product.id && (
-                                            <div className="flex items-center gap-1 flex-shrink-0">
-                                                <button
-                                                    type="button"
-                                                    onClick={(e) => { e.stopPropagation(); setQuantity(Math.max(1, quantity - 1)); }}
-                                                    className="w-9 h-9 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
-                                                >
-                                                    <Minus className="w-4 h-4" />
-                                                </button>
-                                                <span className="w-9 text-center font-bold">{quantity}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={(e) => { e.stopPropagation(); setQuantity(quantity + 1); }}
-                                                    className="w-9 h-9 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
-                                                >
-                                                    <Plus className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-
-                                {/* Add-on product */}
-                                {PRODUCTS.filter((p) => p.id !== selectedProduct.id).map((addon) => (
-                                    <div
-                                        key={`addon-${addon.id}`}
-                                        onClick={() => setAddOns((prev) => ({ ...prev, [addon.id]: !prev[addon.id] }))}
-                                        className={`flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                                            addOns[addon.id]
-                                                ? "border-amber-400 bg-amber-50 shadow-md"
-                                                : "border-gray-200 bg-white hover:border-amber-200"
-                                        }`}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={!!addOns[addon.id]}
-                                            onChange={() => setAddOns((prev) => ({ ...prev, [addon.id]: !prev[addon.id] }))}
-                                            className="w-5 h-5 accent-amber-500"
-                                        />
-                                        <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100">
-                                            <Image src={addon.image} alt={addon.label} width={56} height={56} className="w-full h-full object-cover" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="font-bold text-gray-900 text-sm">{addon.label}</h4>
-                                            <p className="text-xs text-gray-500 mt-0.5">অতিরিক্ত যোগ করুন · ৳{addon.price.toLocaleString()}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                        <div className="hero-content w-full">
+                            <div className="container mx-auto px-4 max-w-5xl text-center">
                             </div>
-                            <p className="text-xs text-center text-gray-500 mt-3">
-                                মূল পণ্যের পাশাপাশি অতিরিক্ত আইটেমও যোগ করতে পারেন।
-                            </p>
                         </div>
+                    </section>
 
-                        {/* Form + Summary Grid */}
-                        <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            {/* Customer Information */}
-                            <form onSubmit={handleOrder} id="checkout-form">
-                                <h4 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
-                                    <Phone className="w-5 h-5 text-green-600" />
-                                    আপনার তথ্য দিন
-                                </h4>
+                    {/* SECTION 2 — Text Section (green bg) */}
+                    <section
+                        id="section-251"
+                        className="landing-section"
+                        style={{ backgroundColor: "#e0ffef" }}
+                    >
+                        <div className="container mx-auto px-4 max-w-5xl">
+                            <div className="text-center mb-8">
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+                                    চাঁপাইনবাবগঞ্জের বিখ্যাত হিমসাগর বা ক্ষীরসাপাত আম
+                                </h2>
+                            </div>
+                            <div className="prose prose-lg mx-auto text-gray-800 leading-relaxed text-center">
+                                চাঁপাইনবাবগঞ্জের হিমসাগর আম বাংলাদেশের অন্যতম সেরা এবং সুস্বাদু আম। যা স্থানীয়ভাবে ক্ষীরসাপাত নামে সর্বাধিক পরিচিত। এটি স্বাদে-গন্ধে অতুলনীয় এবং জনপ্রিয়তার কারণে একে &quot;আমের রাজা&quot; বলা হয়। ২০১৯ সালে এই আমটি বাংলাদেশের ৩য় ভৌগোলিক নির্দেশক (GI) পণ্য হিসেবে আনুষ্ঠানিক স্বীকৃতি লাভ করে।
+                            </div>
+                        </div>
+                    </section>
 
-                                {error && (
-                                    <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
-                                        {error}
-                                    </div>
-                                )}
+                    {/* SECTION 3 — Specialties (features + image, green gradient background) */}
+                    <section
+                        id="section-250"
+                        className="landing-section specialties-section py-12 md:py-16"
+                    >
+                        <div className="container mx-auto px-4 max-w-5xl">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-center">
 
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                            আপনার নাম *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                            required
-                                            placeholder="সম্পূর্ণ নাম লিখুন"
-                                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 transition-colors text-gray-900"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                            মোবাইল নম্বর *
-                                        </label>
-                                        <input
-                                            type="tel"
-                                            value={phone}
-                                            onChange={(e) => setPhone(e.target.value)}
-                                            required
-                                            placeholder="01XXXXXXXXX"
-                                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 transition-colors text-gray-900"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                            সম্পূর্ণ ঠিকানা *
-                                        </label>
-                                        <textarea
-                                            value={address}
-                                            onChange={(e) => setAddress(e.target.value)}
-                                            required
-                                            rows={3}
-                                            placeholder="বাড়ি/রোড নং, উপজেলা, জেলা"
-                                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 transition-colors text-gray-900 resize-none"
-                                        />
-                                    </div>
-
-                                    {/* Delivery Zone */}
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                            <Truck className="w-4 h-4 inline mr-1 text-green-600" />
-                                            ডেলিভারি এলাকা
-                                        </label>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {[
-                                                { key: "dhaka", label: "ঢাকায়", sub: "২-৩ দিন", charge: "৳০" },
-                                                { key: "outside", label: "ঢাকার বাইরে", sub: "৩-৫ দিন", charge: "৳০" },
-                                            ].map((zone) => (
-                                                <div
-                                                    key={zone.key}
-                                                    onClick={() => setDeliveryZone(zone.key as "dhaka" | "outside")}
-                                                    className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                                                        deliveryZone === zone.key
-                                                            ? "border-green-500 bg-green-50"
-                                                            : "border-gray-200 hover:border-green-300"
-                                                    }`}
-                                                >
-                                                    <div className="flex items-center justify-between">
-                                                        <div>
-                                                            <p className="font-bold text-sm text-gray-900">{zone.label}</p>
-                                                            <p className="text-xs text-gray-500">{zone.sub}</p>
-                                                        </div>
-                                                        <span className="font-bold text-green-600 text-sm">{zone.charge}</span>
-                                                    </div>
+                                {/* Content Column */}
+                                <div className="order-2 lg:order-1">
+                                    <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-900 leading-tight">
+                                        হিমসাগর আমের বৈশিষ্ট্য
+                                    </h2>
+                                    <div className="space-y-3 mb-6">
+                                        {FEATURES.map((feat, i) => (
+                                            <div key={i} className="flex items-start space-x-3">
+                                                <div className="flex-shrink-0 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mt-0.5">
+                                                    <Check style={{ width: 12, height: 12, color: "white" }} />
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-
-                            {/* Order Summary */}
-                            <div>
-                                <h4 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
-                                    <MapPin className="w-5 h-5 text-green-600" />
-                                    আপনার অর্ডার
-                                </h4>
-
-                                <div className="bg-gray-50 rounded-2xl p-5 mb-5 space-y-3">
-                                    {/* Main product */}
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2 min-w-0">
-                                            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                <Package className="w-4 h-4 text-white" />
+                                                <p className="text-base md:text-lg text-gray-700 leading-relaxed">{feat}</p>
                                             </div>
-                                            <span className="font-medium text-gray-900 text-sm truncate">{selectedProduct.label}</span>
-                                        </div>
-                                        <span className="font-bold text-gray-900 ml-2 flex-shrink-0">
-                                            ৳{(selectedProduct.price * quantity).toLocaleString()}
-                                        </span>
+                                        ))}
                                     </div>
-                                    <div className="text-xs text-gray-500 pl-10">পরিমাণ: {quantity}</div>
-
-                                    {/* Add-ons */}
-                                    {PRODUCTS.filter((p) => addOns[p.id] && p.id !== selectedProduct.id).map((p) => (
-                                        <div key={`summary-${p.id}`} className="flex items-center justify-between">
-                                            <span className="text-sm text-gray-700 truncate">{p.label}</span>
-                                            <span className="font-medium text-gray-700 flex-shrink-0 ml-2">৳{p.price.toLocaleString()}</span>
-                                        </div>
-                                    ))}
-
-                                    <div className="border-t border-gray-200 pt-3 space-y-2">
-                                        <div className="flex justify-between text-sm text-gray-600">
-                                            <span>পণ্যের মূল্য</span>
-                                            <span>৳{subtotal.toLocaleString()}</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm text-gray-600">
-                                            <span>ডেলিভারি চার্জ</span>
-                                            <span className="text-green-600 font-bold">বিনামূল্যে</span>
-                                        </div>
-                                        <div className="flex justify-between font-extrabold text-lg border-t border-gray-200 pt-2 mt-1">
-                                            <span>সর্বমোট</span>
-                                            <span className="text-green-700">৳{total.toLocaleString()}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* COD Badge */}
-                                <div className="flex items-center gap-3 py-3 px-4 bg-green-50 border-2 border-green-200 rounded-xl mb-5">
-                                    <ShieldCheck className="w-5 h-5 text-green-600 flex-shrink-0" />
                                     <div>
-                                        <p className="font-bold text-green-900 text-sm">ক্যাশ অন ডেলিভারি (COD)</p>
-                                        <p className="text-xs text-green-700">পণ্য হাতে পেয়ে টাকা দিন — কোনো ঝুঁকি নেই!</p>
+                                        <button
+                                            onClick={scrollToOrder}
+                                            className="cta-button primary px-6 py-3 text-base font-semibold rounded-lg transition-all duration-200 hover:scale-105"
+                                        >
+                                            এখনই অর্ডার করুন
+                                        </button>
                                     </div>
                                 </div>
 
-                                {/* Place Order */}
+                                {/* Image Column */}
+                                <div className="order-1 lg:order-2">
+                                    <div className="relative w-full max-w-full sm:max-w-md mx-auto lg:mx-0 specialties-image-wrap">
+                                        <div className="rounded-xl overflow-hidden shadow-lg bg-gray-100 flex items-center justify-center">
+                                            <img
+                                                src="/himsagar-specialties.png"
+                                                alt="Specialties Image"
+                                                className="landing-fit-img block max-h-[85vh] sm:max-h-none"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* SECTION 4 — Second Hero (full screen bg image) */}
+                    <section
+                        id="section-252"
+                        className="hero-section overflow-hidden hero-image-responsive"
+                        style={{
+                            backgroundImage: "url('/himsagar-hero-2.png')",
+                            backgroundSize: "cover",
+                            backgroundPosition: "center top",
+                            backgroundRepeat: "no-repeat",
+                            height: "100vh",
+                        }}
+                    >
+                        <div className="hero-content w-full">
+                            <div className="container mx-auto px-4 max-w-5xl text-center"></div>
+                        </div>
+                    </section>
+
+                    {/* SECTION 5 — CTA Section (light green) */}
+                    <section
+                        id="section-254"
+                        className="landing-section"
+                        style={{ backgroundColor: "#e0ffee" }}
+                    >
+                        <div className="container mx-auto px-4 max-w-5xl text-center">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+                                নাহিদস ওয়ার্ল্ড থেকে অগ্রিম টাকা ছাড়াই অর্ডার করুন চাঁপাইনবাবগঞ্জের প্রিমিয়াম হিমসাগর আম।
+                            </h2>
+                            <div className="flex flex-wrap justify-center gap-4 mt-6">
                                 <button
-                                    type="submit"
-                                    form="checkout-form"
-                                    disabled={isLoading}
-                                    className="w-full py-4 bg-green-600 hover:bg-green-700 disabled:opacity-70 text-white font-extrabold text-lg rounded-xl transition-all shadow-lg hover:shadow-green-600/30 flex items-center justify-center gap-2"
+                                    onClick={scrollToOrder}
+                                    className="inline-flex items-center rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 bg-green-600 text-white hover:bg-green-700 px-6 py-3 text-base"
                                 >
-                                    {isLoading ? (
-                                        <>
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                            অর্ডার প্রসেস হচ্ছে...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ShieldCheck className="w-5 h-5" />
-                                            PLACE ORDER — ৳{total.toLocaleString()}
-                                        </>
-                                    )}
+                                    অর্ডার করতে ক্লিক করুন
+                                    <ArrowRight style={{ width: 16, height: 16, marginLeft: 8 }} />
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
+                    </section>
 
-            {/* ── Footer ── */}
-            <footer className="bg-gray-900 text-gray-400 py-10">
-                <div className="max-w-5xl mx-auto px-6 text-center">
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                        <Image src="/logo.png" alt="Logo" width={36} height={36} className="rounded-full" />
-                        <span className="font-bold text-white text-lg">Village Organic Fruits Ltd.</span>
-                    </div>
-                    <p className="text-sm mb-4">সরাসরি বাগান থেকে আপনার দরজায়</p>
-                    <div className="flex justify-center gap-6 text-sm mb-6">
-                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-                        <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-                        <Link href="/refund" className="hover:text-white transition-colors">Refund</Link>
-                        <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
-                    </div>
-                    <p className="text-xs text-gray-600">© 2025 Village Organic Fruits Ltd. All rights reserved.</p>
-                </div>
-            </footer>
+                    {/* SECTION 6 — Product Checkout */}
+                    <section
+                        id="product-checkout"
+                        className="landing-section product-checkout-section"
+                    >
+                        <div className="container mx-auto px-4 max-w-4xl">
+                            {error && (
+                                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-center gap-2">
+                                    <X style={{ width: 16, height: 16 }} />
+                                    {error}
+                                </div>
+                            )}
 
-            {/* ── Sticky Bottom CTA (mobile) ── */}
-            <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-gray-200 p-3 shadow-2xl">
-                <a
-                    href="#order-form"
-                    className="block w-full py-4 bg-green-600 hover:bg-green-700 text-white font-extrabold text-center rounded-xl transition-colors text-lg"
-                >
-                    🥭 এখনই অর্ডার করুন — ৳{PRODUCTS[0].price.toLocaleString()}
-                </a>
+                            <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+                                {/* আপনার পণ্য */}
+                                <div className="bg-gradient-to-r from-green-50 to-green-100 p-4">
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2.5 sm:mb-3 text-center">আপনার পণ্য</h3>
+                                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                        <div className="divide-y divide-gray-100">
+                                            {/* Main product row */}
+                                            <div className="flex items-center gap-3 p-3 sm:p-4 bg-white hover:bg-gray-50/80 transition-colors">
+                                                <div className="flex-shrink-0 self-center w-5 flex justify-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="mainProductCheckbox"
+                                                        checked={mainIncluded}
+                                                        onChange={() => setMainIncluded(!mainIncluded)}
+                                                    />
+                                                </div>
+                                                <div className="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-100">
+                                                    <img src={MAIN_PRODUCT.image} alt={MAIN_PRODUCT.name} className="w-full h-full object-contain" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-semibold text-gray-900 text-sm sm:text-base leading-snug">{MAIN_PRODUCT.name}</h4>
+                                                    <p className="text-xs text-gray-500 mt-0.5">pack</p>
+                                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                                        <span className="text-xs line-through text-gray-400">৳{MAIN_PRODUCT.originalPrice.toLocaleString()}</span>
+                                                        <span className="text-base sm:text-lg font-bold text-green-600">৳{MAIN_PRODUCT.price.toLocaleString()}</span>
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    id="mainProductQuantityWrap"
+                                                    className={`flex items-center gap-1 flex-shrink-0 transition-opacity ${mainIncluded ? "" : "opacity-40 pointer-events-none"}`}
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        disabled={!mainIncluded}
+                                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                                        className="main-qty-btn w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors active:scale-95 disabled:opacity-50"
+                                                    >
+                                                        <Minus style={{ width: 14, height: 14 }} />
+                                                    </button>
+                                                    <span className="text-sm font-semibold px-2 min-w-[2.25rem] text-center bg-gray-50 rounded py-1 border border-gray-200">
+                                                        {quantity}
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        disabled={!mainIncluded}
+                                                        onClick={() => setQuantity(quantity + 1)}
+                                                        className="main-qty-btn w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors active:scale-95 disabled:opacity-50"
+                                                    >
+                                                        <Plus style={{ width: 14, height: 14 }} />
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Addon product row */}
+                                            <div
+                                                className={`supporting-item-card flex items-center gap-3 p-3 sm:p-4 bg-white border border-transparent hover:border-green-300 transition-all ${addonIncluded ? "selected" : ""}`}
+                                            >
+                                                <div className="flex-shrink-0 self-center w-5 flex justify-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="supporting-item-checkbox w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-green-500 focus:ring-offset-0"
+                                                        checked={addonIncluded}
+                                                        onChange={() => setAddonIncluded(!addonIncluded)}
+                                                    />
+                                                </div>
+                                                <div className="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-100">
+                                                    <img src={ADDON_PRODUCT.image} alt={ADDON_PRODUCT.name} className="w-full h-full object-contain" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h5 className="font-semibold text-gray-900 text-sm sm:text-base leading-snug">{ADDON_PRODUCT.name}</h5>
+                                                    <p className="text-xs text-gray-500 mt-0.5">pack · ৳{ADDON_PRODUCT.price.toLocaleString()}</p>
+                                                </div>
+                                                <div className={`supporting-item-quantity flex items-center gap-1 flex-shrink-0 ${addonIncluded ? "" : "hidden"}`}>
+                                                    <button type="button" onClick={() => setAddonQty(Math.max(1, addonQty - 1))} className="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors active:scale-95">
+                                                        <Minus style={{ width: 14, height: 14 }} />
+                                                    </button>
+                                                    <span className="text-sm font-semibold min-w-[2rem] text-center px-1.5 py-1 bg-gray-50 rounded border border-gray-200">{addonQty}</span>
+                                                    <button type="button" onClick={() => setAddonQty(addonQty + 1)} className="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors active:scale-95">
+                                                        <Plus style={{ width: 14, height: 14 }} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-center text-gray-600 mt-2 px-1">
+                                        মূল পণ্য আনচেক করলে শুধু নির্বাচিত অতিরিক্ত আইটেম অর্ডার হবে।
+                                    </p>
+                                </div>
+
+                                {/* Checkout Form */}
+                                <div className="p-6">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                        {/* Customer Information */}
+                                        <div>
+                                            <h4 className="text-xl font-semibold mb-4 text-gray-900">আপনার তথ্য দিন</h4>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">আপনার নাম *</label>
+                                                    <input
+                                                        type="text"
+                                                        value={name}
+                                                        onChange={e => setName(e.target.value)}
+                                                        required
+                                                        placeholder="সম্পূর্ণ নাম লিখুন"
+                                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">মোবাইল নাম্বার *</label>
+                                                    <input
+                                                        type="tel"
+                                                        value={phone}
+                                                        onChange={e => setPhone(e.target.value)}
+                                                        required
+                                                        placeholder="সঠিক ১১ ডিজিটের মোবাইল নাম্বার"
+                                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">সম্পূর্ণ ঠিকানা *</label>
+                                                    <textarea
+                                                        value={address}
+                                                        onChange={e => setAddress(e.target.value)}
+                                                        required
+                                                        rows={3}
+                                                        placeholder="বাড়ি/রোড নং, রোড বা উপজেলা, জেলা"
+                                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none resize-none"
+                                                    />
+                                                </div>
+                                                {/* Delivery Method */}
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2">ডেলিভারি পদ্ধতি</label>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <div
+                                                            className={`landing-shipping-card rounded-lg p-3 border-2 ${shippingType === "dhaka" ? "selected" : "border-gray-200"}`}
+                                                            id="landing-shipping-dhaka"
+                                                            onClick={() => setShippingType("dhaka")}
+                                                        >
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <div className="font-semibold text-sm">ঢাকায়</div>
+                                                                    <div className="text-xs text-gray-600">২-৩ দিন</div>
+                                                                </div>
+                                                                <div className="font-bold text-green-600">৳0</div>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            className={`landing-shipping-card rounded-lg p-3 border-2 ${shippingType === "urgent" ? "selected" : "border-gray-200"}`}
+                                                            id="landing-shipping-urgent"
+                                                            onClick={() => setShippingType("urgent")}
+                                                        >
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <div className="font-semibold text-sm">ঢাকার বাইরে</div>
+                                                                    <div className="text-xs text-gray-600">৩-৫ দিন</div>
+                                                                </div>
+                                                                <div className="font-bold text-orange-600">৳0</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Order Summary */}
+                                        <div>
+                                            <h4 className="text-xl font-semibold mb-4 text-gray-900">আপনার অর্ডার</h4>
+                                            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                                                {/* Primary Product Summary */}
+                                                <div
+                                                    id="mainProductSummaryBlock"
+                                                    className={`mb-2 transition-opacity ${mainIncluded ? "" : "opacity-50"}`}
+                                                >
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <div className="flex items-center space-x-2 min-w-0">
+                                                            <div className="w-8 h-8 bg-green-600 rounded flex-shrink-0 flex items-center justify-center">
+                                                                <Package style={{ width: 16, height: 16, color: "white" }} />
+                                                            </div>
+                                                            <span className="font-medium truncate">{MAIN_PRODUCT.name}</span>
+                                                        </div>
+                                                        <span className="font-semibold flex-shrink-0 ml-2">
+                                                            ৳{mainSubtotal.toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    {mainIncluded && (
+                                                        <div id="mainQuantitySummaryRow" className="text-sm text-gray-600 pl-10">
+                                                            পরিমাণ: {quantity}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Addon Summary */}
+                                                {addonIncluded && (
+                                                    <div className="mt-2 space-y-1" id="selectedSupportingItemsList">
+                                                        <div className="border-t pt-2">
+                                                            <div className="text-xs font-semibold text-gray-600 mb-1">অতিরিক্ত আইটেম:</div>
+                                                            <div className="flex items-center justify-between text-sm text-gray-700">
+                                                                <span className="truncate">{ADDON_PRODUCT.name} × {addonQty}</span>
+                                                                <span className="font-medium ml-2">৳{addonSubtotal.toLocaleString()}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                <div className="border-t pt-3 mt-3">
+                                                    <div className="flex justify-between text-sm">
+                                                        <span>পণ্যের মূল্য</span>
+                                                        <span>৳{subtotal.toLocaleString()}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-sm mt-1">
+                                                        <span>ডেলিভারি চার্জ</span>
+                                                        <span>৳{deliveryCharge}</span>
+                                                    </div>
+                                                    <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">
+                                                        <span>সর্বমোট</span>
+                                                        <span>৳{total.toLocaleString()}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* COD Badge */}
+                                            <div className="flex items-center gap-2 py-2 px-3 bg-green-50 border border-green-200 rounded-lg text-sm mb-6">
+                                                <Banknote style={{ width: 16, height: 16, color: "#16a34a", flexShrink: 0 }} />
+                                                <span className="font-medium text-green-900">ক্যাশ অন ডেলিভারি (COD)</span>
+                                                <span className="text-green-600">— পণ্য হাতে পেয়ে টাকা দিন</span>
+                                            </div>
+
+                                            <button
+                                                onClick={handlePlaceOrder}
+                                                disabled={isLoading || total === 0}
+                                                className="w-full bg-green-600 text-white py-4 rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                                            >
+                                                {isLoading ? (
+                                                    <>
+                                                        <Loader2 style={{ width: 20, height: 20 }} className="animate-spin" />
+                                                        প্রসেস হচ্ছে...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Lock style={{ width: 20, height: 20 }} />
+                                                        PLACE ORDER - ৳{total.toLocaleString()}
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
             </div>
-        </div>
+
+            {/* Success Modal Overlay */}
+            {success && (
+                <div id="successPopup" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform animate-bounce-in">
+                        <div className="p-6 text-center">
+                            {/* Success Icon */}
+                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <CheckCircle className="w-8 h-8 text-green-600" />
+                            </div>
+                            
+                            {/* Success Message */}
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">অর্ডার সফল হয়েছে!</h3>
+                            <p className="text-gray-600 mb-4">আপনার অর্ডার সফলভাবে সম্পন্ন হয়েছে।</p>
+                            
+                            {/* Order Number */}
+                            <div className="bg-green-50 rounded-lg p-3 mb-6">
+                                <p className="text-sm text-gray-600">অর্ডার নাম্বার</p>
+                                <p className="text-lg font-bold text-green-600">#ORD-{orderId}</p>
+                            </div>
+                            
+                            {/* Additional Info */}
+                            <p className="text-sm text-gray-500 mb-6">আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব। ধন্যবাদ!</p>
+                            <p className="text-xs text-gray-400 mb-4">Redirecting to home page in 5 seconds...</p>
+                            
+                            {/* Close Button */}
+                            <button
+                                onClick={() => window.location.href = "/"}
+                                className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                            >
+                                Continue Shopping
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }

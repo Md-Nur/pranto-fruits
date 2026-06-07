@@ -13,8 +13,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     const pathname = usePathname();
     const isAdmin = pathname.startsWith("/admin");
 
-    if (isAdmin) {
-        // Admin pages get their own layout — no public site chrome
+    const isLanding = pathname.startsWith("/landing");
+
+    if (isAdmin || isLanding) {
+        // Admin and Landing pages get their own layout — no public site chrome
         return <>{children}</>;
     }
 
