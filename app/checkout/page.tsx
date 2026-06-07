@@ -51,14 +51,28 @@ export default function CheckoutPage() {
 
     // Helper to extract weight in kg from variant label
     const parseWeight = (label: string): number => {
-        const match = label.toLowerCase().match(/(\d+(\.\d+)?)\s*(kg|g|gm)/);
-        if (!match) return 0;
-        let value = parseFloat(match[1]);
-        const unit = match[3];
-        if (unit === 'g' || unit === 'gm') {
-            value = value / 1000;
+        if (!label) return 0;
+        const bengaliToEnglish: Record<string, string> = {
+            '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+            '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+        };
+        let normalized = label.toLowerCase();
+        for (const [bn, en] of Object.entries(bengaliToEnglish)) {
+            normalized = normalized.replaceAll(bn, en);
         }
-        return value;
+        const numMatch = normalized.match(/(\d+(\.\d+)?)/);
+        if (!numMatch) return 0;
+        const value = parseFloat(numMatch[1]);
+        const isGram = /(g|gm|gram|গ্রাম|জি)/.test(normalized) && 
+                       !/(kg|k\.g|kilo|কেজি|কে)/.test(normalized);
+        const isKg = /(kg|k\.g|kilo|কেজি|কে)/.test(normalized);
+        if (isGram) {
+            return value / 1000;
+        } else if (isKg) {
+            return value;
+        } else {
+            return value >= 100 ? value / 1000 : value;
+        }
     };
 
     const totalWeight = cart.reduce((total, item) => {
@@ -522,7 +536,7 @@ export default function CheckoutPage() {
                                 <span>৳{cartTotal}</span>
                             </div>
                             <div className="flex justify-between text-gray-500">
-                                <span>Shipping ({totalWeight}kg)</span>
+                                <span>Shipping{totalWeight > 0 ? ` (${totalWeight}kg)` : ''}</span>
                                 <span>৳{shippingCost}</span>
                             </div>
                             <div className="flex justify-between text-gray-500 border-t border-dashed pt-2 mt-2 font-bold text-gray-900">
