@@ -81,21 +81,27 @@ export default function CheckoutPage() {
     }, 0);
 
     const calculateShipping = () => {
-        if (cart.length === 0) return 0;
+        if (cart.length === 0 || totalWeight <= 0) return 0;
         
         const isDhaka = shippingInfo.city === "dhaka";
         const isHome = shippingInfo.deliveryType === "home";
         
-        let baseCharge = 0;
+        let rate = 0;
         if (isDhaka) {
-            baseCharge = isHome ? 170 : 120;
+            rate = isHome ? 22 : 13;
         } else {
-            baseCharge = isHome ? 220 : 160;
+            rate = isHome ? 26 : 16;
         }
         
-        // Double when it's 20kg (assumes charge is per 10kg block)
-        const weightFactor = Math.max(1, Math.ceil(totalWeight / 10));
-        return baseCharge * weightFactor;
+        return Math.ceil(totalWeight) * rate;
+    };
+
+    const getShippingCostForType = (delType: "home" | "point") => {
+        if (cart.length === 0 || totalWeight <= 0) return 0;
+        const isDhaka = shippingInfo.city === "dhaka";
+        const isHome = delType === "home";
+        let rate = isDhaka ? (isHome ? 22 : 13) : (isHome ? 26 : 16);
+        return Math.ceil(totalWeight) * rate;
     };
 
     const shippingCost = calculateShipping();
@@ -251,6 +257,10 @@ export default function CheckoutPage() {
         );
     }
 
+    const isDhakaCity = shippingInfo.city === "dhaka";
+    const homeRate = isDhakaCity ? 22 : 26;
+    const pointRate = isDhakaCity ? 13 : 16;
+
     return (
         <div className="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
             {/* Header / Breadcrumb */}
@@ -342,7 +352,7 @@ export default function CheckoutPage() {
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-sm">Home Delivery</p>
-                                                    <p className="text-xs text-gray-500">To your doorstep</p>
+                                                    <p className="text-xs text-gray-500">To your doorstep · ৳{homeRate}/kg (Total: ৳{getShippingCostForType("home")})</p>
                                                 </div>
                                             </div>
                                             <input type="radio" name="deliveryType" value="home" checked={shippingInfo.deliveryType === 'home'} onChange={handleInputChange} className="hidden" />
@@ -354,7 +364,7 @@ export default function CheckoutPage() {
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-sm">Point Delivery</p>
-                                                    <p className="text-xs text-gray-500">Pickup from point</p>
+                                                    <p className="text-xs text-gray-500">Pickup from point · ৳{pointRate}/kg (Total: ৳{getShippingCostForType("point")})</p>
                                                 </div>
                                             </div>
                                             <input type="radio" name="deliveryType" value="point" checked={shippingInfo.deliveryType === 'point'} onChange={handleInputChange} className="hidden" />

@@ -31,6 +31,8 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
     const [addonsQty, setAddonsQty] = useState<Record<string, number>>({});
 
     const [shippingType, setShippingType] = useState<"dhaka" | "urgent">("dhaka");
+    const [deliveryType, setDeliveryType] = useState<"home" | "point">("home");
+
 
     // Form state
     const [name, setName] = useState("");
@@ -114,16 +116,24 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
         return w;
     })();
 
-    const calculateShipping = (type: "dhaka" | "urgent"): number => {
+    const calculateShipping = (type: "dhaka" | "urgent", delType: "home" | "point" = deliveryType): number => {
         const hasItems = mainIncluded || Object.values(addonsChecked).some(Boolean);
-        if (!hasItems) return 0;
-        // Home delivery base charges: Dhaka ৳170, Outside Dhaka ৳220
-        const baseCharge = type === "dhaka" ? 170 : 220;
-        const weightFactor = Math.max(1, Math.ceil(totalWeight / 10));
-        return baseCharge * weightFactor;
+        if (!hasItems || totalWeight <= 0) return 0;
+        const isDhaka = type === "dhaka";
+        const isHome = delType === "home";
+        
+        let rate = 0;
+        if (isDhaka) {
+            rate = isHome ? 22 : 13;
+        } else {
+            rate = isHome ? 26 : 16;
+        }
+        
+        return Math.ceil(totalWeight) * rate;
     };
 
-    const deliveryCharge = calculateShipping(shippingType);
+
+    const deliveryCharge = calculateShipping(shippingType, deliveryType);
     const total = subtotal + deliveryCharge;
 
     // Auto-redirect to home page on success
@@ -181,7 +191,7 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
                         address,
                         city: shippingType === "dhaka" ? "dhaka" : "other",
                         zipCode: "",
-                        deliveryType: "home",
+                        deliveryType: deliveryType,
                     },
                     paymentMethod: "cod",
                     paymentDetails: null,
@@ -204,6 +214,9 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
     const hero1Image = product.images?.[0] || product.image || "/images/placeholder.jpg";
     const specialtiesImage = product.images?.[1] || product.image || "/images/placeholder.jpg";
     const hero2Image = product.images?.[2] || product.image || "/images/placeholder.jpg";
+
+    const homeRate = shippingType === "dhaka" ? 22 : 26;
+    const pointRate = shippingType === "dhaka" ? 13 : 16;
 
     return (
         <>
@@ -612,10 +625,10 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
                                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none resize-none"
                                                     />
                                                 </div>
-                                                {/* Delivery Method */}
+                                                {/* Delivery Area */}
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">ডেলিভারি পদ্ধতি</label>
-                                                    <div className="grid grid-cols-2 gap-2">
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2 font-hind-siliguri">ডেলিভারি এরিয়া</label>
+                                                    <div className="grid grid-cols-2 gap-2 mb-3">
                                                         <div
                                                             className={`landing-shipping-card rounded-lg p-3 border-2 ${shippingType === "dhaka" ? "selected" : "border-gray-200"}`}
                                                             id="landing-shipping-dhaka"
@@ -626,7 +639,6 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
                                                                     <div className="font-semibold text-sm">ঢাকায়</div>
                                                                     <div className="text-xs text-gray-600">২-৩ দিন</div>
                                                                 </div>
-                                                                <div className="font-bold text-green-600">৳{calculateShipping("dhaka")}</div>
                                                             </div>
                                                         </div>
                                                         <div
@@ -639,7 +651,39 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
                                                                     <div className="font-semibold text-sm">ঢাকার বাইরে</div>
                                                                     <div className="text-xs text-gray-600">৩-৫ দিন</div>
                                                                 </div>
-                                                                <div className="font-bold text-orange-600">৳{calculateShipping("urgent")}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Delivery Type */}
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2 font-hind-siliguri">ডেলিভারি ধরন</label>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <div
+                                                            className={`landing-shipping-card rounded-lg p-3 border-2 ${deliveryType === "home" ? "selected" : "border-gray-200"}`}
+                                                            id="landing-delivery-home"
+                                                            onClick={() => setDeliveryType("home")}
+                                                        >
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <div className="font-semibold text-sm">হোম ডেলিভারি</div>
+                                                                    <div className="text-xs text-gray-500">৳{homeRate}/কেজি</div>
+                                                                </div>
+                                                                <div className="font-bold text-green-600">৳{calculateShipping(shippingType, "home")}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            className={`landing-shipping-card rounded-lg p-3 border-2 ${deliveryType === "point" ? "selected" : "border-gray-200"}`}
+                                                            id="landing-delivery-point"
+                                                            onClick={() => setDeliveryType("point")}
+                                                        >
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <div className="font-semibold text-sm">পয়েন্ট ডেলিভারি</div>
+                                                                    <div className="text-xs text-gray-500">৳{pointRate}/কেজি</div>
+                                                                </div>
+                                                                <div className="font-bold text-green-600">৳{calculateShipping(shippingType, "point")}</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -698,7 +742,7 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
                                                         <span>৳{subtotal.toLocaleString()}</span>
                                                     </div>
                                                     <div className="flex justify-between text-sm mt-1">
-                                                        <span>ডেলিভারি চার্জ</span>
+                                                        <span>ডেলিভারি চার্জ {totalWeight > 0 ? `(${totalWeight}kg)` : ''}</span>
                                                         <span>৳{deliveryCharge}</span>
                                                     </div>
                                                     <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">
