@@ -637,7 +637,7 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
                                                             <div className="flex items-center justify-between">
                                                                 <div>
                                                                     <div className="font-semibold text-sm">ঢাকায়</div>
-                                                                    <div className="text-xs text-gray-600">২-৩ দিন</div>
+                                                                    <div className="text-xs text-gray-600">১-২ দিন</div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -649,7 +649,7 @@ const ProductDetailClient = ({ product }: { product: ProductWithVariants }) => {
                                                             <div className="flex items-center justify-between">
                                                                 <div>
                                                                     <div className="font-semibold text-sm">ঢাকার বাইরে</div>
-                                                                    <div className="text-xs text-gray-600">৩-৫ দিন</div>
+                                                                    <div className="text-xs text-gray-600">২-৩ দিন</div>
                                                                 </div>
                                                             </div>
                                                         </div>
