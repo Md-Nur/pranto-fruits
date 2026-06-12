@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { X, Phone, MapPin, Mail, CreditCard, Package } from "lucide-react";
+import { X, Phone, MapPin, Mail, CreditCard, Package, Home } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -138,7 +138,18 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusUpdate }: OrderDetai
 
                     {/* Customer Info */}
                     <div>
-                        <h3 className="text-sm font-bold text-gray-900 mb-3">Customer Information</h3>
+                        <h3 className="text-sm font-bold text-gray-900 mb-3 flex flex-wrap items-center justify-between gap-2">
+                            <span>Customer Information</span>
+                            {shippingInfo?.deliveryType === "point" ? (
+                                <span className="inline-flex items-center gap-1 font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs">
+                                    <MapPin size={12} /> Point Delivery
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center gap-1 font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full text-xs">
+                                    <Home size={12} /> Home Delivery
+                                </span>
+                            )}
+                        </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             <div className="flex items-center gap-2 text-gray-600">
                                 <Phone size={14} className="text-gray-400" />

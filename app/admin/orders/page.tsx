@@ -108,12 +108,24 @@ export default function AdminOrdersPage() {
                             <tbody>
                                 {orders.map((order) => {
                                     const sc = statusConfig[order.status];
+                                    const shippingInfo = typeof order.shippingInfo === "string" ? JSON.parse(order.shippingInfo) : order.shippingInfo;
                                     return (
                                         <tr key={order.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4 font-bold text-gray-900">#{order.id}</td>
                                             <td className="px-4 py-4">
                                                 <p className="font-medium text-gray-700">{order.user?.name || "Unknown"}</p>
-                                                <p className="text-xs text-gray-400">{order.user?.phone}</p>
+                                                <div className="flex items-center gap-1.5 mt-0.5">
+                                                    <span className="text-xs text-gray-400">{order.user?.phone}</span>
+                                                    {shippingInfo?.deliveryType === "point" ? (
+                                                        <span className="text-[9px] px-1.5 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-md font-semibold whitespace-nowrap">
+                                                            Point
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-[9px] px-1.5 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md font-semibold whitespace-nowrap">
+                                                            Home
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-4 py-4 font-bold text-gray-900">৳{order.totalAmount?.toLocaleString()}</td>
                                             <td className="px-4 py-4">
