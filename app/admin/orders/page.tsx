@@ -113,9 +113,16 @@ export default function AdminOrdersPage() {
                                         <tr key={order.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4 font-bold text-gray-900">#{order.id}</td>
                                             <td className="px-4 py-4">
-                                                <p className="font-medium text-gray-700">{order.user?.name || "Unknown"}</p>
+                                                <p className="font-medium text-gray-700">
+                                                    {order.user?.name || 
+                                                     (shippingInfo?.firstName || shippingInfo?.lastName 
+                                                         ? `${shippingInfo.firstName || ""} ${shippingInfo.lastName || ""}`.trim() 
+                                                         : shippingInfo?.name || "Unknown")}
+                                                </p>
                                                 <div className="flex items-center gap-1.5 mt-0.5">
-                                                    <span className="text-xs text-gray-400">{order.user?.phone}</span>
+                                                    <span className="text-xs text-gray-400">
+                                                        {order.user?.phone || shippingInfo?.phone || "N/A"}
+                                                    </span>
                                                     {shippingInfo?.deliveryType === "point" ? (
                                                         <span className="text-[9px] px-1.5 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-md font-semibold whitespace-nowrap">
                                                             Point

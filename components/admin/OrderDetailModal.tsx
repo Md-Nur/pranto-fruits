@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { X, Phone, MapPin, Mail, CreditCard, Package, Home } from "lucide-react";
+import { X, Phone, MapPin, Mail, CreditCard, Package, Home, User } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -151,6 +151,15 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusUpdate }: OrderDetai
                             )}
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                            <div className="flex items-center gap-2 text-gray-600 sm:col-span-2">
+                                <User size={14} className="text-gray-400" />
+                                <span className="font-semibold text-gray-900">
+                                    {order.user?.name || 
+                                     (shippingInfo?.firstName || shippingInfo?.lastName 
+                                         ? `${shippingInfo.firstName || ""} ${shippingInfo.lastName || ""}`.trim() 
+                                         : shippingInfo?.name || "N/A")}
+                                </span>
+                            </div>
                             <div className="flex items-center gap-2 text-gray-600">
                                 <Phone size={14} className="text-gray-400" />
                                 <span>{order.user?.phone || shippingInfo?.phone || "N/A"}</span>
